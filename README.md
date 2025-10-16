@@ -56,11 +56,12 @@ GATEWAY_DELETE_ON_COMPLETE=true
 
 WARMUP_ENABLED=true
 
-# Type of the payload to send: DEFAULT, SMART_TRACKER, SMART_METER
+# Type of the payload to send: DEFAULT, SMART_TRACKER, SMART_METER, INDUSTRIAL_PLC, EBMPAPST_FFU
 # RANDOM - TODO: add description
 # SMART_TRACKER - sample payload: {"latitude": 42.222222, "longitude": 73.333333, "speed": 55.5, "fuel": 92, "batteryLevel": 81}
 # SMART_METER - sample payload: {"pulseCounter": 1234567, "leakage": false, "batteryLevel": 81}
 # INDUSTRIAL_PLC - sample payload (60 lines by default) {"line001": 1.0023, "line002": 95.440321}
+# EBMPAPST_FFU - ebm-papst Fan Filter Unit with MODBUS telemetry: {"actualSpeed": 1547, "dcLinkVoltage": 398.5, "dcLinkCurrent": 3.67, "powerConsumption": 1315, "differentialPressure": 287, "motorTemperature": 52, "operatingHours": 12456, "operatingStatus": "RUNNING"}
 TEST_PAYLOAD_TYPE=SMART_METER
 # datapoints per single message (used for INDUSTRIAL_PLC)
 TEST_PAYLOAD_DATAPOINTS=60
