@@ -1,0 +1,89 @@
+{
+  "title": "Monitor FFUs",
+  "image": null,
+  "mobileHide": false,
+  "mobileOrder": null,
+  "configuration": {
+    "description": "",
+    "widgets": {},
+    "states": {
+      "default": {
+        "name": "Monitor FFUs",
+        "root": true,
+        "layouts": {
+          "main": {
+            "widgets": {},
+            "gridSettings": {
+              "layoutType": "default",
+              "backgroundColor": "#eeeeee",
+              "columns": 24,
+              "margin": 10,
+              "outerMargin": true,
+              "backgroundSizeMode": "100%"
+            }
+          }
+        }
+      }
+  
+    "entityAliases": {
+      "6ec9e7f3-52e7-8416-a085-b243251ca8f2": {
+        "id": "6ec9e7f3-52e7-8416-a085-b243251ca8f2",
+        "alias": "DW00000012",
+        "filter": {
+          "type": "singleEntity",
+          "singleEntity": {
+            "entityType": "DEVICE",
+            "id": "b8ed6a40-aaa8-11f0-af4d-97d7c19de825"
+        
+          "resolveMultiple": false
+        }
+      }
+  
+    "filters": {},
+    "timewindow": {
+      "displayValue": "",
+      "hideAggregation": false,
+      "hideAggInterval": false,
+      "hideTimezone": false,
+      "selectedTab": 0,
+      "realtime": {
+        "realtimeType": 0,
+        "interval": 1000,
+        "timewindowMs": 60000,
+        "quickInterval": "CURRENT_DAY",
+        "hideInterval": false,
+        "hideLastInterval": false,
+        "hideQuickInterval": false
+    
+      "history": {
+        "historyType": 0,
+        "interval": 1000,
+        "timewindowMs": 60000,
+        "fixedTimewindow": {
+          "startTimeMs": 1760544007672,
+          "endTimeMs": 1760630407672
+      
+        "quickInterval": "CURRENT_DAY",
+        "hideInterval": false,
+        "hideLastInterval": false,
+        "hideFixedInterval": false,
+        "hideQuickInterval": false
+    
+      "aggregation": {
+        "type": "AVG",
+        "limit": 25000
+      }
+  
+    "settings": {
+      "stateControllerId": "entity",
+      "showTitle": false,
+      "showDashboardsSelect": true,
+      "showEntitiesSelect": true,
+      "showDashboardTimewindow": true,
+      "showDashboardExport": true,
+      "toolbarAlwaysOpen": true
+    }
+
+  "name": "Monitor FFUs",
+  "resources": []
+}

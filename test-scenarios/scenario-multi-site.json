@@ -1,0 +1,230 @@
+{
+  "scenarioName": "Multi-Site Manufacturing Network",
+  "description": "2 sites, 3 buildings, 6 floors, 12 rooms, 12 gateways, 120 FFU devices",
+  ***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+
+  "testConfig": {
+    "messagesPerSecond": 70,
+    "durationInSeconds": 86400,
+    "payloadType": "EBMPAPST_FFU",
+    "warmupEnabled": true
+
+  "site": {
+    "name": "Vietnam Manufacturing Sites",
+    "type": "Site",
+    "location": {
+      "latitude": 21.0285,
+      "longitude": 105.8542
+  
+    "address": "Vietnam"
+
+  "buildings": [
+    {
+      "name": "Hanoi Building A",
+      "type": "Building",
+      "label": "Hanoi Cleanroom Facility",
+      "location": {
+        "latitude": 21.0285,
+        "longitude": 105.8542
+    
+      "address": "456 Hanoi Industrial Zone, Hanoi, Vietnam",
+      "email": "hanoi.facility@company.com",
+      "phone": "+84-24-3456-7890",
+      "floors": [
+        {
+          "name": "Floor 3",
+          "type": "Floor",
+          "label": "Production Floor 3",
+          "rooms": [
+            {
+              "name": "Room 301",
+              "type": "Room",
+              "label": "ISO 5 Cleanroom",
+              "classification": "ISO 5",
+              "area_sqm": 100,
+              "floorPlan": "https://example.com/floorplans/hn-f3-room-301.png",
+              "gateways": [
+                {
+                  "name": "GW-HN-F3-R301",
+                  "type": "Gateway",
+                  "label": "Gateway Floor 3 Room 301",
+                  "protocol": "MQTT",
+                  "devices": {
+                    "prefix": "DW-HN-F3-R301",
+                    "start": 0,
+                    "end": 9,
+                    "count": 10,
+                    "layout": "grid",
+                    "gridColumns": 5,
+                    "gridRows": 2,
+                    "startX": 0.1,
+                    "startY": 0.1,
+                    "spacingX": 0.15,
+                    "spacingY": 0.15
+                  }
+                }
+              ]
+          
+            {
+              "name": "Room 302",
+              "type": "Room",
+              "label": "ISO 6 Cleanroom",
+              "classification": "ISO 6",
+              "area_sqm": 80,
+              "gateways": [
+                {
+                  "name": "GW-HN-F3-R302",
+                  "type": "Gateway",
+                  "label": "Gateway Floor 3 Room 302",
+                  "protocol": "MQTT",
+                  "devices": {
+                    "prefix": "DW-HN-F3-R302",
+                    "start": 0,
+                    "end": 9,
+                    "count": 10,
+                    "layout": "grid",
+                    "gridColumns": 5,
+                    "gridRows": 2,
+                    "startX": 0.1,
+                    "startY": 0.1,
+                    "spacingX": 0.15,
+                    "spacingY": 0.15
+                  }
+                }
+              ],
+              "floorPlan": "https://example.com/floorplans/hn-f3-room-302.png"
+            }
+          ]
+      
+        {
+          "name": "Floor 5",
+          "type": "Floor",
+          "label": "Production Floor 5",
+          "rooms": [
+            {
+              "name": "Room 501",
+              "type": "Room",
+              "label": "ISO 5 High-grade",
+              "classification": "ISO 5",
+              "area_sqm": 120,
+              "gateways": [
+                {
+                  "name": "GW-HN-F5-R501",
+                  "type": "Gateway",
+                  "label": "Gateway Floor 5 Room 501",
+                  "protocol": "MQTT",
+                  "devices": {
+                    "prefix": "DW-HN-F5-R501",
+                    "start": 0,
+                    "end": 14,
+                    "count": 15,
+                    "layout": "grid",
+                    "gridColumns": 5,
+                    "gridRows": 3,
+                    "startX": 0.1,
+                    "startY": 0.1,
+                    "spacingX": 0.15,
+                    "spacingY": 0.15
+                  }
+                }
+              ],
+              "floorPlan": "https://example.com/floorplans/hn-f5-room-501.png"
+          
+            {
+              "name": "Room 502",
+              "type": "Room",
+              "label": "ISO 6 Standard",
+              "classification": "ISO 6",
+              "area_sqm": 100,
+              "gateways": [
+                {
+                  "name": "GW-HN-F5-R502",
+                  "type": "Gateway",
+                  "label": "Gateway Floor 5 Room 502",
+                  "protocol": "MQTT",
+                  "devices": {
+                    "prefix": "DW-HN-F5-R502",
+                    "start": 0,
+                    "end": 14,
+                    "count": 15,
+                    "layout": "grid",
+                    "gridColumns": 5,
+                    "gridRows": 3,
+                    "startX": 0.1,
+                    "startY": 0.1,
+                    "spacingX": 0.15,
+                    "spacingY": 0.15
+                  }
+                }
+              ],
+              "floorPlan": "https://example.com/floorplans/hn-f5-room-502.png"
+            }
+          ]
+        }
+      ]
+  
+    {
+      "name": "HCMC Building B",
+      "type": "Building",
+      "label": "Ho Chi Minh City Facility",
+      "location": {
+        "latitude": 10.7769,
+        "longitude": 106.7009
+    
+      "address": "789 HCMC Industrial Park, District 9, Ho Chi Minh City, Vietnam",
+      "email": "hcmc.facility@company.com",
+      "phone": "+84-28-1234-5678",
+      "floors": [
+        {
+          "name": "Floor 2",
+          "type": "Floor",
+          "label": "Manufacturing Floor",
+          "rooms": [
+            {
+              "name": "Room 201",
+              "type": "Room",
+              "label": "ISO 7 Assembly",
+              "classification": "ISO 7",
+              "area_sqm": 150,
+              "gateways": [
+                {
+                  "name": "GW-HCM-F2-R201",
+                  "type": "Gateway",
+                  "label": "Gateway Floor 2 Room 201",
+                  "protocol": "MQTT",
+                  "devices": {
+                    "prefix": "DW-HCM-F2-R201",
+                    "start": 0,
+                    "end": 19,
+                    "count": 20,
+                    "layout": "grid",
+                    "gridColumns": 6,
+                    "gridRows": 4,
+                    "startX": 0.1,
+                    "startY": 0.1,
+                    "spacingX": 0.15,
+                    "spacingY": 0.15
+                  }
+                }
+              ],
+              "floorPlan": "https://example.com/floorplans/hcm-f2-room-201.png"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "sites": 1,
+    "buildings": 2,
+    "floors": 3,
+    "rooms": 5,
+    "gateways": 5,
+    "devices": 70
+  }
+}

@@ -252,6 +252,14 @@ public abstract class BaseMqttAPITest extends AbstractAPITest {
                 DeviceClient client = deviceClients.get(index);
                 //log.info("device client index {} device {}", index, client.getDeviceName());
                 msgCount++;
+
+                // Skip offline devices - they should not send any telemetry
+                // ThingsBoard will automatically mark them as inactive (active=false)
+                if (isDeviceOffline(client.getDeviceName())) {
+                    iterationLatch.countDown();  // Still count down to prevent deadlock
+                    continue;
+                }
+
                 Msg message = getNextMessage(client.getDeviceName(), alarmRequired);
                 if (message.isTriggersAlarm()) {
                     alarmCount++;
@@ -286,4 +294,15 @@ public abstract class BaseMqttAPITest extends AbstractAPITest {
     protected abstract void logSuccessTestMessage(int iteration, DeviceClient client);
 
     protected abstract void logFailureTestMessage(int iteration, DeviceClient client, Future<?> future);
+
+    /**
+     * Check if device is offline - offline devices should NOT send telemetry.
+     * ThingsBoard will automatically set active=false when no telemetry is received.
+     */
+    protected boolean isDeviceOffline(String deviceName) {
+        // Import the OFFLINE_DEVICES array from telemetry generator
+        return java.util.Arrays.asList(
+            org.thingsboard.tools.service.msg.ebmpapstFfu.EbmpapstFfuTelemetryGenerator.OFFLINE_DEVICES
+        ).contains(deviceName);
+    }
 }

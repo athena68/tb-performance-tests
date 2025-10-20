@@ -47,6 +47,53 @@ public class EbmpapstFfuTelemetryGenerator extends BaseMessageGenerator implemen
     // Airflow calculations (approximation for 355mm fan)
     static final int MAX_AIRFLOW = 2330;                 // m³/h at rated speed
 
+    // Device status configuration - simulates real-world scenarios
+    private static final String[] ALARM_DEVICES = {
+        "DW00000015",  // High differential pressure (filter clogged)
+        "DW00000032",  // Motor overheating
+        "DW00000047"   // High differential pressure (filter clogged)
+    };
+
+    private static final String[] STOPPED_DEVICES = {
+        "DW00000008",  // Manually stopped for maintenance
+        "DW00000023",  // Stopped - awaiting repair
+        "DW00000041"   // Stopped - scheduled maintenance
+    };
+
+    // OFFLINE DEVICES - These should NOT send telemetry at all!
+    // ThingsBoard will automatically set their 'active' attribute to false
+    // when no telemetry is received. Do NOT generate telemetry for these devices.
+    public static final String[] OFFLINE_DEVICES = {
+        "DW00000012",  // Communication lost
+        "DW00000029",  // Network timeout
+        "DW00000056"   // Disconnected
+    };
+
+    // Get persistent device seed for consistent per-device values
+    private int getDeviceSeed(String deviceName) {
+        return Math.abs(deviceName.hashCode());
+    }
+
+    // Check if device has alarm
+    private boolean isAlarmDevice(String deviceName) {
+        for (String device : ALARM_DEVICES) {
+            if (deviceName.equals(device)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Check if device is stopped
+    private boolean isStoppedDevice(String deviceName) {
+        for (String device : STOPPED_DEVICES) {
+            if (deviceName.equals(device)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public Msg getNextMessage(String deviceName, boolean shouldTriggerAlarm) {
         byte[] payload;
@@ -65,12 +112,28 @@ public class EbmpapstFfuTelemetryGenerator extends BaseMessageGenerator implemen
             tsNode.put("ts", System.currentTimeMillis());
             ObjectNode values = tsNode.putObject("values");
 
+            // Get persistent seed for this device
+            int deviceSeed = getDeviceSeed(deviceName);
+            java.util.Random deviceRandom = new java.util.Random(deviceSeed);
+
+            // Determine device status
+            boolean isAlarm = isAlarmDevice(deviceName);
+            boolean isStopped = isStoppedDevice(deviceName);
+
             // Core Motor Parameters
-            // Actual Speed - realistic variation around setpoint
-            int speedSetpoint = random.nextInt(500) + 1300;  // 1300-1800 RPM typical operating range
-            int actualSpeed = speedSetpoint + random.nextInt(20) - 10;  // ±10 RPM variation
+            // Speed Setpoint - PERSISTENT per device (changes rarely, not every message)
+            int speedSetpoint = 1300 + (deviceSeed % 500);  // Each device has its own setpoint (1300-1800 RPM)
+
+            // Actual Speed - depends on device status
+            int actualSpeed;
+            if (isStopped) {
+                actualSpeed = 0;  // No speed when stopped
+            } else {
+                actualSpeed = speedSetpoint + random.nextInt(20) - 10;  // ±10 RPM variation for running devices
+            }
+
             values.put("actualSpeed", actualSpeed);
-            values.put("speedSetpoint", speedSetpoint);
+            values.put("speedSetpoint", speedSetpoint);  // This stays constant for each device
 
             // Calculate airflow based on fan curve (simplified linear approximation)
             double speedRatio = (double) actualSpeed / RATED_SPEED;
@@ -90,57 +153,87 @@ public class EbmpapstFfuTelemetryGenerator extends BaseMessageGenerator implemen
             int powerConsumption = (int) (dcLinkVoltage * dcLinkCurrent * 0.9);  // 90% efficiency
             values.put("powerConsumption", powerConsumption);
 
+            // Ambient Temperature - PERSISTENT per device (room-specific)
+            int ambientTemp = 22 + (deviceSeed % 8);  // Each device has persistent ambient (22-30°C)
+            values.put("ambientTemperature", ambientTemp);
+
             // Differential Pressure across HEPA filter
-            // Increases with airflow and filter clogging
-            int basePressure = (int) (100 + (speedRatio * 150));  // 100-250 Pa for clean filter
-            int filterClogging = random.nextInt(100);  // 0-100 Pa additional for clogging
-            int differentialPressure = shouldTriggerAlarm ?
-                DIFFERENTIAL_PRESSURE_ALARM + random.nextInt(50) :
-                basePressure + filterClogging;
+            int differentialPressure;
+            if (isStopped) {
+                // Stopped devices: pressure drops to zero or ambient
+                differentialPressure = random.nextInt(20);  // 0-20 Pa (no airflow)
+            } else if (isAlarm && (deviceName.equals("DW00000015") || deviceName.equals("DW00000047"))) {
+                // Fixed high pressure for clogged filter devices
+                differentialPressure = DIFFERENTIAL_PRESSURE_ALARM + random.nextInt(50);  // 450-500 Pa
+            } else {
+                // Normal operation: pressure increases with airflow and gradual filter clogging
+                int basePressure = (int) (100 + (speedRatio * 150));  // 100-250 Pa for clean filter
+                int filterClogging = (deviceSeed % 80);  // Persistent filter clogging per device (0-80 Pa)
+                differentialPressure = basePressure + filterClogging + random.nextInt(20);  // Small variation
+            }
             values.put("differentialPressure", differentialPressure);
-            values.put("pressureSetpoint", 250);  // Target differential pressure
+            values.put("pressureSetpoint", 250);  // Target differential pressure (constant)
 
             // Motor Temperature - correlates with load and ambient
-            // ebmpapst has built-in temperature sensors
-            int ambientTemp = 22 + random.nextInt(8);  // 22-30°C ambient
-            int motorTempRise = (int) (loadFactor * 25);  // Temperature rise above ambient
-            int motorTemperature = shouldTriggerAlarm ?
-                MOTOR_TEMP_DERATING + random.nextInt(10) :
-                ambientTemp + motorTempRise + random.nextInt(5);
+            int motorTemperature;
+            if (isStopped) {
+                // Recently stopped devices: temperature cooling down
+                motorTemperature = ambientTemp + random.nextInt(10);  // 0-10°C above ambient
+            } else if (isAlarm && deviceName.equals("DW00000032")) {
+                // Fixed overheating for motor temp fault device
+                motorTemperature = MOTOR_TEMP_DERATING + random.nextInt(10);  // 75-85°C
+            } else {
+                // Normal operation: temperature rises with load
+                int motorTempRise = (int) (loadFactor * 25);  // Temperature rise above ambient
+                motorTemperature = ambientTemp + motorTempRise + random.nextInt(5);  // Small variation
+            }
             values.put("motorTemperature", motorTemperature);
             values.put("motorTempDerating", MOTOR_TEMP_DERATING);
             values.put("motorTempShutdown", MOTOR_TEMP_SHUTDOWN);
-            values.put("ambientTemperature", ambientTemp);
 
-            // Operating Hours - cumulative counter (MODBUS register D009)
-            // In real system, this increments continuously
-            values.put("operatingHours", random.nextInt(50000));
+            // Operating Hours - PERSISTENT cumulative counter (slowly incrementing)
+            // Use device seed as base hours, increment by a few hours each time
+            int baseHours = (deviceSeed % 30000);  // Each device has different base hours (0-30000)
+            int operatingHours = baseHours + (int)((System.currentTimeMillis() / 3600000) % 20000);  // Slowly incrementing
+            values.put("operatingHours", operatingHours);
 
-            // Control Mode: 0=0-10V analog, 1=MODBUS
+            // Control Mode: 1=MODBUS (PERSISTENT - doesn't change)
             values.put("controlMode", 1);  // MODBUS control
 
-            // Operating Status
+            // Operating Status - based on device state
+            // NOTE: OFFLINE status is NOT sent in telemetry!
+            // Offline devices simply stop sending telemetry, and ThingsBoard
+            // will automatically set their 'active' attribute to false.
             String operatingStatus;
             int alarmCode = 0;
             int warningCode = 0;
 
-            if (shouldTriggerAlarm) {
-                if (motorTemperature >= MOTOR_TEMP_SHUTDOWN) {
-                    operatingStatus = "FAULT";
+            if (isStopped) {
+                // Stopped devices - manually stopped for maintenance
+                operatingStatus = "STOPPED";
+            } else if (isAlarm) {
+                // Fixed alarm devices - always show alarms based on their specific issue
+                if (deviceName.equals("DW00000032")) {
+                    // Motor overheating device
+                    operatingStatus = motorTemperature >= MOTOR_TEMP_SHUTDOWN ? "FAULT" : "ALARM";
                     alarmCode = 101;  // Motor overheat alarm
-                } else if (differentialPressure >= DIFFERENTIAL_PRESSURE_ALARM) {
+                } else if (deviceName.equals("DW00000015") || deviceName.equals("DW00000047")) {
+                    // High differential pressure devices (clogged filters)
                     operatingStatus = "ALARM";
                     alarmCode = 201;  // High differential pressure
                 } else {
-                    operatingStatus = "WARNING";
-                    warningCode = 301;  // High temperature warning
+                    operatingStatus = "RUNNING";
                 }
             } else {
-                operatingStatus = actualSpeed < 100 ? "STOPPED" : "RUNNING";
+                // Normal devices - operating properly
+                operatingStatus = "RUNNING";
 
                 // Check for warnings even in normal operation
                 if (differentialPressure > 350) {
                     warningCode = 302;  // Filter maintenance warning
+                }
+                if (motorTemperature > 65) {
+                    warningCode = 301;  // High temperature warning
                 }
             }
 

@@ -51,6 +51,9 @@ public class GatewayBaseTestExecutor extends BaseTestExecutor {
         if (warmupEnabled) {
             gatewayAPITest.warmUpDevices();
         }
+
+        // Real-world behavior: Send attributes once after provisioning (bootstrap)
+        gatewayAPITest.sendInitialAttributes();
     }
 
     @Override

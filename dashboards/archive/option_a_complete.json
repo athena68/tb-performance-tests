@@ -1,0 +1,67 @@
+{
+  "title": "Cleanroom FFU Monitor - Option A",
+  "image": null,
+  "mobileHide": false,
+  "mobileOrder": null,
+  "configuration": {
+    "description": "Real-time monitoring of 60 FFU devices - Option A (Flat View)",
+    "widgets": {},
+    "states": {
+      "default": {
+        "name": "FFU Overview",
+        "root": true,
+        "layouts": {
+          "main": {
+            "widgets": {},
+            "gridSettings": {
+              "layoutType": "default",
+              "backgroundColor": "#eeeeee",
+              "columns": 24,
+              "margin": 10,
+              "outerMargin": true,
+              "backgroundSizeMode": "100%"
+            }
+          }
+        }
+      }
+  
+    "entityAliases": {
+      "all_ffu_devices": {
+        "id": "all_ffu_devices",
+        "alias": "All FFU Devices",
+        "filter": {
+          "type": "entityName",
+          "entityType": "DEVICE",
+          "entityNameFilter": "DW",
+          "resolveMultiple": true
+        }
+      }
+  
+    "filters": {},
+    "timewindow": {
+      "displayValue": "",
+      "hideAggregation": false,
+      "hideAggInterval": false,
+      "hideTimezone": false,
+      "selectedTab": 0,
+      "realtime": {
+        "realtimeType": 0,
+        "interval": 1000,
+        "timewindowMs": 60000
+    
+      "aggregation": {
+        "type": "AVG",
+        "limit": 25000
+      }
+  
+    "settings": {
+      "stateControllerId": "entity",
+      "showTitle": true,
+      "showDashboardsSelect": true,
+      "showEntitiesSelect": true,
+      "showDashboardTimewindow": true,
+      "showDashboardExport": true,
+      "toolbarAlwaysOpen": true
+    }
+  }
+}

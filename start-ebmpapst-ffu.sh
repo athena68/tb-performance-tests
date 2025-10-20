@@ -23,7 +23,7 @@ echo ""
 # Load environment variables from .env.ebmpapst if it exists
 if [ -f .env.ebmpapst ]; then
     echo "Loading configuration from .env.ebmpapst..."
-    export $(cat .env.ebmpapst | grep -v '^#' | xargs)
+    export $(cat .env.ebmpapst | grep -v '^#' | sed 's/#.*$//' | sed 's/[[:space:]]*$//' | grep -v '^$' | xargs)
     echo "Configuration loaded successfully!"
 else
     echo "Warning: .env.ebmpapst not found. Using default values."
@@ -52,7 +52,9 @@ echo "  Number of Devices: $((DEVICE_END_IDX - DEVICE_START_IDX))"
 echo "  Messages per Second: $MESSAGES_PER_SECOND"
 echo "  Test Duration: $DURATION_IN_SECONDS seconds"
 echo "  Create Devices: $DEVICE_CREATE_ON_START"
-echo "  Delete on Complete: $DEVICE_DELETE_ON_COMPLETE"
+echo "  Delete devices on Complete: $DEVICE_DELETE_ON_COMPLETE"
+echo "  Create Gateways: $GATEWAY_CREATE_ON_START"
+echo "  Delete GW on Complete: $DEVICE_DELETE_ON_COMPLETE"
 echo ""
 
 # Confirm before starting

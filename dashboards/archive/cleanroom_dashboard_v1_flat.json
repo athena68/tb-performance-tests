@@ -1,0 +1,478 @@
+{
+  "title": "Cleanroom FFU Monitoring - Flat View",
+  "configuration": {
+    "description": "Real-time monitoring of 60 ebm-papst FFU devices",
+    "widgets": {
+      "card_total_ffus": {
+        "isSystemType": true,
+        "bundleAlias": "cards",
+        "typeAlias": "simple_card",
+        "type": "latest",
+        "title": "Total FFUs",
+        "sizeX": 6,
+        "sizeY": 3,
+        "row": 0,
+        "col": 0,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "all_ffus",
+              "dataKeys": [
+                {
+                  "name": "actualSpeed",
+                  "type": "timeseries",
+                  "label": "Devices",
+                  "aggregationType": "COUNT"
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+        
+          "showTitle": true,
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 500
+        
+          "cardButtons": [],
+          "borderRadius": "4px",
+          "widgetStyle": {},
+          "units": "FFUs",
+          "decimals": 0
+        }
+    
+      "card_active_devices": {
+        "isSystemType": true,
+        "bundleAlias": "cards",
+        "typeAlias": "simple_card",
+        "type": "latest",
+        "title": "Active Devices",
+        "sizeX": 6,
+        "sizeY": 3,
+        "row": 0,
+        "col": 6,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "all_ffus",
+              "dataKeys": [
+                {
+                  "name": "actualSpeed",
+                  "type": "timeseries",
+                  "label": "Active",
+                  "aggregationType": "COUNT"
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+        
+          "showTitle": true,
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 500
+        
+          "units": "devices",
+          "decimals": 0,
+          "color": "#4CAF50"
+        }
+    
+      "card_active_alarms": {
+        "isSystemType": true,
+        "bundleAlias": "cards",
+        "typeAlias": "simple_card",
+        "type": "alarm",
+        "title": "Active Alarms",
+        "sizeX": 6,
+        "sizeY": 3,
+        "row": 0,
+        "col": 12,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "all_ffus",
+              "filterId": "active_alarms"
+            }
+          ],
+          "alarmFilterConfig": {
+            "statusList": ["ACTIVE_UNACK", "ACTIVE_ACK"]
+        
+          "showTitle": true,
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 500
+        
+          "units": "alarms",
+          "decimals": 0,
+          "color": "#F44336"
+        }
+    
+      "card_avg_speed": {
+        "isSystemType": true,
+        "bundleAlias": "cards",
+        "typeAlias": "simple_card",
+        "type": "latest",
+        "title": "Average Motor Speed",
+        "sizeX": 6,
+        "sizeY": 3,
+        "row": 0,
+        "col": 18,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "all_ffus",
+              "dataKeys": [
+                {
+                  "name": "actualSpeed",
+                  "type": "timeseries",
+                  "label": "RPM",
+                  "aggregationType": "AVG"
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+        
+          "showTitle": true,
+          "dropShadow": true,
+          "enableFullscreen": false,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 500
+        
+          "units": "RPM",
+          "decimals": 0,
+          "color": "#2196F3"
+        }
+    
+      "table_all_ffus": {
+        "isSystemType": true,
+        "bundleAlias": "cards",
+        "typeAlias": "entities_table",
+        "type": "latest",
+        "title": "All FFU Devices",
+        "sizeX": 24,
+        "sizeY": 8,
+        "row": 3,
+        "col": 0,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "all_ffus",
+              "dataKeys": [
+                {
+                  "name": "actualSpeed",
+                  "type": "timeseries",
+                  "label": "Speed (RPM)",
+                  "color": "#2196F3"
+              
+                {
+                  "name": "speedSetpoint",
+                  "type": "timeseries",
+                  "label": "Setpoint (RPM)",
+                  "color": "#4CAF50"
+              
+                {
+                  "name": "differentialPressure",
+                  "type": "timeseries",
+                  "label": "Pressure (Pa)",
+                  "color": "#FF9800"
+              
+                {
+                  "name": "motorTemperature",
+                  "type": "timeseries",
+                  "label": "Temp (°C)",
+                  "color": "#F44336"
+              
+                {
+                  "name": "powerConsumption",
+                  "type": "timeseries",
+                  "label": "Power (W)",
+                  "color": "#9C27B0"
+              
+                {
+                  "name": "operatingHours",
+                  "type": "timeseries",
+                  "label": "Hours",
+                  "color": "#607D8B"
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 60000
+            }
+        
+          "showTitle": true,
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "titleStyle": {
+            "fontSize": "16px",
+            "fontWeight": 500
+        
+          "settings": {
+            "enableSearch": true,
+            "enableSelectColumnDisplay": true,
+            "enableStickyHeader": true,
+            "displayPagination": true,
+            "defaultPageSize": 20,
+            "defaultSortOrder": "name"
+          }
+        }
+    
+      "chart_motor_speed": {
+        "isSystemType": true,
+        "bundleAlias": "charts",
+        "typeAlias": "timeseries",
+        "type": "timeseries",
+        "title": "Motor Speed Trends",
+        "sizeX": 12,
+        "sizeY": 6,
+        "row": 11,
+        "col": 0,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "all_ffus",
+              "dataKeys": [
+                {
+                  "name": "actualSpeed",
+                  "type": "timeseries",
+                  "label": "Actual Speed",
+                  "color": "#2196F3"
+              
+                {
+                  "name": "speedSetpoint",
+                  "type": "timeseries",
+                  "label": "Setpoint",
+                  "color": "#4CAF50"
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 300000
+            }
+        
+          "showTitle": true,
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "showLegend": true,
+          "legendConfig": {
+            "position": "bottom",
+            "showMin": false,
+            "showMax": false,
+            "showAvg": true,
+            "showTotal": false
+          }
+        }
+    
+      "chart_pressure": {
+        "isSystemType": true,
+        "bundleAlias": "charts",
+        "typeAlias": "timeseries",
+        "type": "timeseries",
+        "title": "Differential Pressure",
+        "sizeX": 12,
+        "sizeY": 6,
+        "row": 11,
+        "col": 12,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "all_ffus",
+              "dataKeys": [
+                {
+                  "name": "differentialPressure",
+                  "type": "timeseries",
+                  "label": "Pressure (Pa)",
+                  "color": "#FF9800"
+                }
+              ]
+            }
+          ],
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 300000
+            }
+        
+          "showTitle": true,
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "showLegend": true,
+          "thresholds": [
+            {
+              "value": 450,
+              "color": "#F44336",
+              "lineWidth": 2,
+              "label": "Critical"
+            }
+          ]
+        }
+    
+      "table_alarms": {
+        "isSystemType": true,
+        "bundleAlias": "alarm_widgets",
+        "typeAlias": "alarms_table",
+        "type": "alarm",
+        "title": "Active Alarms",
+        "sizeX": 24,
+        "sizeY": 6,
+        "row": 17,
+        "col": 0,
+        "config": {
+          "datasources": [
+            {
+              "type": "entity",
+              "entityAliasId": "all_ffus"
+            }
+          ],
+          "alarmFilterConfig": {
+            "statusList": ["ACTIVE_UNACK", "ACTIVE_ACK", "CLEARED_UNACK"]
+        
+          "timewindow": {
+            "realtime": {
+              "timewindowMs": 86400000
+            }
+        
+          "showTitle": true,
+          "dropShadow": true,
+          "enableFullscreen": true,
+          "settings": {
+            "enableSelection": true,
+            "enableSearch": true,
+            "displayDetails": true,
+            "allowAcknowledgment": true,
+            "allowClear": true,
+            "displayPagination": true,
+            "defaultPageSize": 10,
+            "enableStatusFilter": true
+          }
+        }
+      }
+  
+    "states": {
+      "default": {
+        "name": "FFU Overview",
+        "root": true,
+        "layouts": {
+          "main": {
+            "widgets": {
+              "card_total_ffus": {
+                "sizeX": 6,
+                "sizeY": 3,
+                "row": 0,
+                "col": 0
+            
+              "card_active_devices": {
+                "sizeX": 6,
+                "sizeY": 3,
+                "row": 0,
+                "col": 6
+            
+              "card_active_alarms": {
+                "sizeX": 6,
+                "sizeY": 3,
+                "row": 0,
+                "col": 12
+            
+              "card_avg_speed": {
+                "sizeX": 6,
+                "sizeY": 3,
+                "row": 0,
+                "col": 18
+            
+              "table_all_ffus": {
+                "sizeX": 24,
+                "sizeY": 8,
+                "row": 3,
+                "col": 0
+            
+              "chart_motor_speed": {
+                "sizeX": 12,
+                "sizeY": 6,
+                "row": 11,
+                "col": 0
+            
+              "chart_pressure": {
+                "sizeX": 12,
+                "sizeY": 6,
+                "row": 11,
+                "col": 12
+            
+              "table_alarms": {
+                "sizeX": 24,
+                "sizeY": 6,
+                "row": 17,
+                "col": 0
+              }
+          
+            "gridSettings": {
+              "backgroundColor": "#eeeeee",
+              "columns": 24,
+              "margin": 10,
+              "backgroundSizeMode": "100%"
+            }
+          }
+        }
+      }
+  
+    "entityAliases": {
+      "all_ffus": {
+        "id": "all_ffus",
+        "alias": "All FFU Devices",
+        "filter": {
+          "type": "deviceType",
+          "deviceTypes": ["EBMPAPST_FFU"],
+          "resolveMultiple": true
+        }
+      }
+  
+    "filters": {
+      "active_alarms": {
+        "id": "active_alarms",
+        "filter": {
+          "statusList": ["ACTIVE_UNACK", "ACTIVE_ACK"]
+        }
+      }
+  
+    "timewindow": {
+      "realtime": {
+        "timewindowMs": 60000
+      }
+  
+    "settings": {
+      "stateControllerId": "entity",
+      "showTitle": true,
+      "showDashboardsSelect": true,
+      "showEntitiesSelect": true,
+      "showDashboardTimewindow": true,
+      "showDashboardExport": true,
+      "toolbarAlwaysOpen": true
+    }
+  }
+}

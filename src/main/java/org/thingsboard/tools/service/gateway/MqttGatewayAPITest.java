@@ -107,6 +107,48 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
         }
         reportScheduledFuture = restClientService.getScheduler().scheduleAtFixedRate(this::reportMqttClientsStats, 300, 300, TimeUnit.SECONDS);
         mapDevicesToGatewayClientConnections();
+
+        // Log device-gateway connection mapping grouped by gateway
+        log.info("================================================================================");
+        log.info("GATEWAY CONNECTOR CONFIGURATION");
+        log.info("================================================================================");
+        log.info("");
+
+        // Group devices by gateway
+        java.util.Map<String, java.util.List<DeviceClient>> devicesByGateway = new java.util.LinkedHashMap<>();
+        for (DeviceClient deviceClient : deviceClients) {
+            String gatewayName = deviceClient.getGatewayName();
+            devicesByGateway.computeIfAbsent(gatewayName, k -> new java.util.ArrayList<>()).add(deviceClient);
+        }
+
+        // Display each gateway and its connected devices
+        for (java.util.Map.Entry<String, java.util.List<DeviceClient>> entry : devicesByGateway.entrySet()) {
+            String gatewayName = entry.getKey();
+            java.util.List<DeviceClient> devices = entry.getValue();
+
+            log.info("┌─────────────────────────────────────────────────────────────────────────────┐");
+            log.info(String.format("│ Gateway: %-66s │", gatewayName));
+            log.info("│ Connector Type: MQTT                                                        │");
+            log.info(String.format("│ Devices Connected: %-58d │", devices.size()));
+            log.info("├─────────────────────────────────────────────────────────────────────────────┤");
+            log.info("│ Device Name          │ Device Type     │ Status       │ Connector Type    │");
+            log.info("├──────────────────────┼─────────────────┼──────────────┼───────────────────┤");
+
+            for (DeviceClient deviceClient : devices) {
+                log.info(String.format("│ %-20s │ %-15s │ %-12s │ %-17s │",
+                    deviceClient.getDeviceName(),
+                    "EBMPAPST_FFU",
+                    "Mapped",
+                    "MQTT"));
+            }
+
+            log.info("└─────────────────────────────────────────────────────────────────────────────┘");
+            log.info("");
+        }
+
+        log.info("================================================================================");
+        log.info("SUMMARY: {} devices mapped to {} gateways", deviceClients.size(), mqttClients.size());
+        log.info("================================================================================");
     }
 
     private void mapDevicesToGatewayClientConnections() {
@@ -123,6 +165,99 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
     }
 
     @Override
+    public void warmUpDevices() throws InterruptedException {
+        super.warmUpDevices();
+
+        // Log device connection details AFTER warmup completes - grouped by gateway
+        log.info("");
+        log.info("================================================================================");
+        log.info("DEVICE CONNECTION STATUS - All Devices Connected via Gateway");
+        log.info("================================================================================");
+        log.info("");
+
+        // Group devices by gateway
+        java.util.Map<String, java.util.List<DeviceClient>> devicesByGateway = new java.util.LinkedHashMap<>();
+        for (DeviceClient deviceClient : deviceClients) {
+            String gatewayName = deviceClient.getGatewayName();
+            devicesByGateway.computeIfAbsent(gatewayName, k -> new java.util.ArrayList<>()).add(deviceClient);
+        }
+
+        // Display each gateway and its connected devices
+        for (java.util.Map.Entry<String, java.util.List<DeviceClient>> entry : devicesByGateway.entrySet()) {
+            String gatewayName = entry.getKey();
+            java.util.List<DeviceClient> devices = entry.getValue();
+
+            log.info("┌─────────────────────────────────────────────────────────────────────────────┐");
+            log.info(String.format("│ Gateway: %-66s │", gatewayName));
+            log.info("│ Connector Type: MQTT                                                        │");
+            log.info(String.format("│ Devices Connected: %-58d │", devices.size()));
+            log.info("├─────────────────────────────────────────────────────────────────────────────┤");
+            log.info("│ Device Name          │ Device Type     │ Status       │ Connector Type    │");
+            log.info("├──────────────────────┼─────────────────┼──────────────┼───────────────────┤");
+
+            for (DeviceClient deviceClient : devices) {
+                log.info(String.format("│ %-20s │ %-15s │ %-12s │ %-17s │",
+                    deviceClient.getDeviceName(),
+                    "EBMPAPST_FFU",
+                    "Connected",
+                    "MQTT"));
+            }
+
+            log.info("└─────────────────────────────────────────────────────────────────────────────┘");
+            log.info("");
+        }
+
+        log.info("================================================================================");
+        log.info("SUMMARY: {} devices successfully connected through {} gateways",
+            deviceClients.size(), mqttClients.size());
+        log.info("================================================================================");
+        log.info("");
+    }
+
+    @Override
+    public void sendInitialAttributes() throws InterruptedException {
+        log.info("Sending initial attributes for {} devices...", deviceClients.size());
+        AtomicInteger totalSent = new AtomicInteger();
+        AtomicInteger totalFailed = new AtomicInteger();
+        CountDownLatch latch = new CountDownLatch(deviceClients.size());
+
+        for (DeviceClient deviceClient : deviceClients) {
+            restClientService.getScheduler().submit(() -> {
+                try {
+                    // Get attribute message from attribute generator
+                    byte[] payload = attrMsgGenerator.getNextMessage(deviceClient.getDeviceName(), false).getData();
+
+                    deviceClient.getMqttClient().publish("v1/gateway/attributes",
+                        io.netty.buffer.Unpooled.wrappedBuffer(payload),
+                        io.netty.handler.codec.mqtt.MqttQoS.AT_MOST_ONCE)
+                            .addListener(future -> {
+                                if (future.isSuccess()) {
+                                    totalSent.incrementAndGet();
+                                    log.debug("Initial attributes sent for device: {}", deviceClient.getDeviceName());
+                                } else {
+                                    totalFailed.incrementAndGet();
+                                    log.error("Failed to send initial attributes for device: {}", deviceClient.getDeviceName(), future.cause());
+                                }
+                                latch.countDown();
+                            });
+                } catch (Exception e) {
+                    totalFailed.incrementAndGet();
+                    log.error("Error preparing attributes for device: {}", deviceClient.getDeviceName(), e);
+                    latch.countDown();
+                }
+            });
+        }
+
+        boolean completed = latch.await(60, TimeUnit.SECONDS);
+        if (completed) {
+            log.info("Initial attributes sent successfully for {} devices! Failed: {}", totalSent.get(), totalFailed.get());
+        } else {
+            log.error("Timeout while sending initial attributes! Sent: {}, Failed: {}, Remaining: {}",
+                totalSent.get(), totalFailed.get(), latch.getCount());
+        }
+    }
+
+    @Override
     public void runApiTests() throws InterruptedException {
         super.runApiTests(deviceClients.size());
     }
@@ -135,7 +270,8 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
 
     @Override
     protected byte[] getData(String deviceName) {
-        return ("{\"device\":\"" + deviceName + "\"}").getBytes(StandardCharsets.UTF_8);
+        // Include device type in gateway connect to ensure proper device provisioning
+        return ("{\"device\":\"" + deviceName + "\",\"type\":\"EBMPAPST_FFU\"}").getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
@@ -145,7 +281,16 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
 
     @Override
     protected String getTestTopic() {
-        return telemetryTest ? "v1/gateway/telemetry" : "v1/gateway/attributes";
+        // Gateway mode: attributes are sent once during initialization
+        // Test phase always sends continuous telemetry
+        return "v1/gateway/telemetry";
+    }
+
+    @Override
+    protected org.thingsboard.tools.service.msg.Msg getNextMessage(String deviceName, boolean alarmRequired) {
+        // Gateway mode: always use telemetry generator for test phase
+        // Attributes are sent separately during initialization
+        return tsMsgGenerator.getNextMessage(deviceName, alarmRequired);
     }
 
     @Override

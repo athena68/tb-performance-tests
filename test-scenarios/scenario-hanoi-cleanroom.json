@@ -1,0 +1,111 @@
+{
+  "scenarioName": "Hanoi Cleanroom Facility",
+  "description": "Single building cleanroom with 2 floors, 4 rooms, 2 gateways, 60 FFU devices",
+  ***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+***REMOVED***
+
+  "testConfig": {
+    "messagesPerSecond": 60,
+    "durationInSeconds": 86400,
+    "payloadType": "EBMPAPST_FFU",
+    "warmupEnabled": true
+
+  "site": {
+    "name": "Hanoi",
+    "type": "Site",
+    "latitude": 21.0285,
+    "longitude": 105.8542,
+    "address": "Hanoi, Vietnam"
+
+  "buildings": [
+    {
+      "name": "FPT Building Duy Tan",
+      "type": "Building",
+      "label": "Cleanroom Manufacturing Facility",
+      "latitude": 21.031061691896873,
+      "longitude": 105.78285935286266,
+      "address": "17 Duy Tan, Cau Giay, Hanoi, Vietnam",
+      "email": "facility.hanoi@fpt.com",
+      "phone": "+84-24-1234-5678",
+      "floors": [
+        {
+          "name": "Floor 5",
+          "type": "Floor",
+          "label": "Cleanroom Area - ISO 5/6",
+          "rooms": [
+            {
+              "name": "Room R501",
+              "type": "Room",
+              "label": "ISO 5 Cleanroom",
+              "classification": "ISO 5",
+              "area_sqm": 100,
+              "floorPlan": "/api/images/tenant/floor5floorPlan.jpg",
+              "gateways": [
+                {
+                  "name": "GW00000000",
+                  "type": "Gateway",
+                  "label": "Gateway - Room R501",
+                  "protocol": "MQTT",
+                  "devices": {
+                    "prefix": "DW",
+                    "start": 0,
+                    "end": 29,
+                    "count": 30,
+                    "layout": "grid",
+                    "gridColumns": 6,
+                    "gridRows": 5,
+                    "startX": 0.1,
+                    "startY": 0.1,
+                    "spacingX": 0.05,
+                    "spacingY": 0.05
+                  }
+                }
+              ]
+          
+            {
+              "name": "Room R502",
+              "type": "Room",
+              "label": "ISO 6 Cleanroom",
+              "classification": "ISO 6",
+              "area_sqm": 80,
+              "floorPlan": "/api/images/tenant/floor5floorPlan.jpg",
+              "gateways": [
+                {
+                  "name": "GW00000001",
+                  "type": "Gateway",
+                  "label": "Gateway - Room R502",
+                  "protocol": "MQTT",
+                  "devices": {
+                    "prefix": "DW",
+                    "start": 30,
+                    "end": 59,
+                    "count": 30,
+                    "layout": "grid",
+                    "gridColumns": 6,
+                    "gridRows": 5,
+                    "startX": 0.1,
+                    "startY": 0.1,
+                    "spacingX": 0.05,
+                    "spacingY": 0.05
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "sites": 1,
+    "buildings": 1,
+    "floors": 1,
+    "rooms": 2,
+    "gateways": 2,
+    "devices": 60
+  }
+}

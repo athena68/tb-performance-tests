@@ -98,7 +98,8 @@ public class EbmpapstFfuAttributesGenerator extends BaseMessageGenerator impleme
             values.put("maxSpeed", 2000);    // RPM
             values.put("minSpeed", 500);     // RPM
             values.put("ratedAirflow", 2330); // m³/h
-            values.put("ratedPower", 1500);   // W
+            values.put("ratedPower", 1500);   // W (maximum rated power)
+            values.put("nominalPower", 1050 + random.nextInt(150));  // W (typical operating power at 70-80% load, 1050-1200W)
             values.put("ratedVoltage", 400);  // V DC-Link
             values.put("ratedCurrent", 4.5);  // A
 
