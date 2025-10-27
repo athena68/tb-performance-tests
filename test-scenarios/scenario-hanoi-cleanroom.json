@@ -58,8 +58,8 @@
                     "layout": "grid",
                     "gridColumns": 6,
                     "gridRows": 5,
-                    "startX": 0.1,
-                    "startY": 0.1,
+                    "startX": 0.4,
+                    "startY": 0.4,
                     "spacingX": 0.05,
                     "spacingY": 0.05
                   }
@@ -87,8 +87,8 @@
                     "layout": "grid",
                     "gridColumns": 6,
                     "gridRows": 5,
-                    "startX": 0.1,
-                    "startY": 0.1,
+                    "startX": 0.4,
+                    "startY": 0.4,
                     "spacingX": 0.05,
                     "spacingY": 0.05
                   }

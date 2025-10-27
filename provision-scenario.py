@@ -11,6 +11,10 @@ import requests
 import argparse
 from typing import Dict, List, Optional
 
+DEFAULT_TB_URL = 'http://167.99.64.71:8080'
+DEFAULT_TB_USERNAME = 'tenant@thingsboard.org'
+DEFAULT_TB_PASSWORD = 'tenant'
+
 class ThingsBoardProvisioner:
     def __init__(self, url: str, username: str, password: str):
         self.url = url.rstrip('/')
@@ -378,19 +382,21 @@ class ThingsBoardProvisioner:
 
         return True
 
-    def provision_scenario(self, scenario_file: str) -> bool:
-        """Provision entire scenario from JSON file"""
+    def provision_scenario(self, scenario_file: str, scenario_data: Optional[Dict] = None) -> bool:
+        """Provision entire scenario from JSON file or pre-loaded data"""
         print(f"\n{'='*60}")
         print(f"Provisioning Scenario: {scenario_file}")
         print(f"{'='*60}\n")
 
         # Load scenario
-        try:
-            with open(scenario_file, 'r') as f:
-                scenario = json.load(f)
-        except Exception as e:
-            print(f"✗ Failed to load scenario file: {e}")
-            return False
+        scenario = scenario_data
+        if scenario is None:
+            try:
+                with open(scenario_file, 'r') as f:
+                    scenario = json.load(f)
+            except Exception as e:
+                print(f"✗ Failed to load scenario file: {e}")
+                return False
 
         print(f"Scenario: {scenario.get('scenarioName')}")
         print(f"Description: {scenario.get('description')}\n")
@@ -680,21 +686,36 @@ EXIT_AFTER_COMPLETE=true
 def main():
     parser = argparse.ArgumentParser(description='Provision ThingsBoard hierarchy from scenario')
     parser.add_argument('scenario', help='Path to scenario JSON file')
-    parser.add_argument('--url', default=os.getenv('REST_URL', 'http://167.99.64.71:8080'),
-                        help='ThingsBoard server URL')
-    parser.add_argument('--username', default=os.getenv('REST_USERNAME', 'tenant@thingsboard.org'),
-                        help='ThingsBoard username')
-    parser.add_argument('--password', default=os.getenv('REST_PASSWORD', 'tenant'),
-                        help='ThingsBoard password')
+    parser.add_argument('--url', default=None,
+                        help='ThingsBoard server URL (overrides scenario/env)')
+    parser.add_argument('--username', default=None,
+                        help='ThingsBoard username (overrides scenario/env)')
+    parser.add_argument('--password', default=None,
+                        help='ThingsBoard password (overrides scenario/env)')
 
     args = parser.parse_args()
 
-    provisioner = ThingsBoardProvisioner(args.url, args.username, args.password)
+    try:
+        with open(args.scenario, 'r') as scenario_file:
+            scenario_data = json.load(scenario_file)
+    except Exception as e:
+        print(f"✗ Failed to load scenario file '{args.scenario}': {e}")
+        sys.exit(1)
+
+    tb_config = scenario_data.get('thingsboard', {})
+
+    resolved_url = args.url or tb_config.get('url') or os.getenv('REST_URL') or DEFAULT_TB_URL
+    resolved_username = args.username or tb_config.get('username') or os.getenv('REST_USERNAME') or DEFAULT_TB_USERNAME
+    resolved_password = args.password or tb_config.get('password') or os.getenv('REST_PASSWORD') or DEFAULT_TB_PASSWORD
+
+    print(f"Using ThingsBoard endpoint {resolved_url} (user: {resolved_username})")
+
+    provisioner = ThingsBoardProvisioner(resolved_url, resolved_username, resolved_password)
 
     if not provisioner.login():
         sys.exit(1)
 
-    if not provisioner.provision_scenario(args.scenario):
+    if not provisioner.provision_scenario(args.scenario, scenario_data):
         sys.exit(1)
 
     print("✓ All done!")
