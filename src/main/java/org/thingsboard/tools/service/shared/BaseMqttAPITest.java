@@ -176,6 +176,7 @@ public abstract class BaseMqttAPITest extends AbstractAPITest {
     private MqttClient initClient(String token) throws Exception {
         MqttClientConfig config = new MqttClientConfig(getSslContext());
         config.setUsername(token);
+        config.setTimeoutSeconds(60);  // Enable MQTT keep-alive to prevent idle connection timeouts
         MqttClient client = MqttClient.create(config, null, null);
         client.setEventLoop(EVENT_LOOP_GROUP);
         Future<MqttConnectResult> connectFuture = client.connect(mqttHost, mqttPort);
