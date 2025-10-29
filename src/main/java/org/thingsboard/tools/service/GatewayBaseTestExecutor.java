@@ -52,6 +52,10 @@ public class GatewayBaseTestExecutor extends BaseTestExecutor {
             gatewayAPITest.warmUpDevices();
         }
 
+        // Create "Created" relations for gateway dashboards
+        // This must be done AFTER devices are provisioned via v1/gateway/connect
+        gatewayAPITest.createGatewayDeviceRelations();
+
         // Real-world behavior: Send attributes once after provisioning (bootstrap)
         gatewayAPITest.sendInitialAttributes();
     }

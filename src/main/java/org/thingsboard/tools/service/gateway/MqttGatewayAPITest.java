@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.thingsboard.server.common.data.Device;
 import org.thingsboard.server.common.data.id.IdBased;
+import org.thingsboard.tools.service.gateway.GatewayRelationManager;
 import org.thingsboard.tools.service.mqtt.DeviceClient;
 import org.thingsboard.tools.service.shared.BaseMqttAPITest;
 
@@ -29,7 +30,9 @@ import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +50,11 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
     int gatewayEndIdxConfig;
     @Value("${gateway.count}")
     int gatewayCount;
+    @Value("${gateway.createRelations:true}")
+    boolean createGatewayRelations;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private GatewayRelationManager gatewayRelationManager;
 
     private List<Device> gateways = Collections.synchronizedList(new ArrayList<>(1024));
 
@@ -302,6 +310,114 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
     protected void logFailureTestMessage(int iteration, DeviceClient client, Future<?> future) {
         log.error("[{}] Error while publishing message to device: {} and gateway: {}", iteration, client.getDeviceName(), client.getGatewayName(),
                 future.cause());
+    }
+
+    @Override
+    public void createGatewayDeviceRelations() throws Exception {
+        if (!createGatewayRelations) {
+            log.info("Gateway relation creation is disabled (gateway.createRelations=false)");
+            return;
+        }
+
+        if (gatewayRelationManager == null) {
+            log.warn("GatewayRelationManager not available, skipping relation creation");
+            return;
+        }
+
+        log.info("");
+        log.info("================================================================================");
+        log.info("CREATING GATEWAY-DEVICE 'Created' RELATIONS");
+        log.info("================================================================================");
+        log.info("");
+
+        // Build gateway-to-devices map
+        Map<Device, List<Device>> gatewayDeviceMap = new HashMap<>();
+
+        // Fetch gateway objects from ThingsBoard if not already loaded
+        List<Device> gatewayList = gateways;
+        if (gatewayList.isEmpty()) {
+            log.info("Gateway list is empty, fetching from ThingsBoard...");
+            gatewayList = new ArrayList<>();
+            for (int i = gatewayStartIdx; i < gatewayEndIdx; i++) {
+                String gatewayName = getToken(true, i);
+                try {
+                    Device gateway = restClientService.getRestClient().getTenantDevice(gatewayName).orElse(null);
+                    if (gateway != null) {
+                        gatewayList.add(gateway);
+                        log.info("  ✓ Found gateway: {}", gatewayName);
+                    } else {
+                        log.warn("  ✗ Gateway {} not found in ThingsBoard", gatewayName);
+                    }
+                } catch (Exception e) {
+                    log.error("  ✗ Failed to fetch gateway {}: {}", gatewayName, e.getMessage());
+                }
+            }
+            log.info("Fetched {} gateways from ThingsBoard", gatewayList.size());
+        } else {
+            log.info("Using {} gateways from existing list", gatewayList.size());
+        }
+
+        // First, fetch all device objects from ThingsBoard
+        log.info("Fetching device objects from ThingsBoard...");
+        Map<String, Device> deviceMap = new HashMap<>();
+        for (int i = deviceStartIdx; i < deviceEndIdx; i++) {
+            String deviceName = getToken(false, i);
+            try {
+                Device device = restClientService.getRestClient().getTenantDevice(deviceName).orElse(null);
+                if (device != null) {
+                    deviceMap.put(deviceName, device);
+                } else {
+                    log.warn("Device {} not found in ThingsBoard", deviceName);
+                }
+            } catch (Exception e) {
+                log.error("Failed to fetch device {}: {}", deviceName, e.getMessage());
+            }
+        }
+
+        log.info("Fetched {} devices from ThingsBoard", deviceMap.size());
+
+        // Map devices to gateways based on deviceClients mapping
+        log.info("Mapping devices to gateways...");
+        for (Device gateway : gatewayList) {
+            List<Device> gatewayDevices = new ArrayList<>();
+
+            // Find all devices that belong to this gateway
+            for (DeviceClient deviceClient : deviceClients) {
+                if (deviceClient.getGatewayName().equals(gateway.getName())) {
+                    Device device = deviceMap.get(deviceClient.getDeviceName());
+                    if (device != null) {
+                        gatewayDevices.add(device);
+                    }
+                }
+            }
+
+            if (!gatewayDevices.isEmpty()) {
+                gatewayDeviceMap.put(gateway, gatewayDevices);
+                log.info("Mapped {} devices to gateway {}", gatewayDevices.size(), gateway.getName());
+            }
+        }
+
+        // Create relations
+        int totalRelations = gatewayRelationManager.createAllGatewayDeviceRelations(gatewayDeviceMap);
+
+        log.info("");
+        log.info("================================================================================");
+        log.info("'Created' RELATION SUMMARY");
+        log.info("================================================================================");
+        log.info("Total gateways: {}", gatewayList.size());
+        log.info("Total devices: {}", deviceMap.size());
+        log.info("Total 'Created' relations: {}", totalRelations);
+        log.info("================================================================================");
+        log.info("");
+        log.info("Verification:");
+        log.info("  1. Login to ThingsBoard UI");
+        if (!gatewayList.isEmpty()) {
+            log.info("  2. Navigate to: Devices → {} → Relations", gatewayList.get(0).getName());
+        }
+        log.info("  3. You should see 'Created' relations to all devices");
+        log.info("  4. Gateway dashboards should now display device information");
+        log.info("================================================================================");
+        log.info("");
     }
 
     @Override

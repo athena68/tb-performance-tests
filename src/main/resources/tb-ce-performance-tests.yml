@@ -141,6 +141,7 @@ gateway:
   count: "${GATEWAY_COUNT:3}" # count of devices to be used by clients in k8s deployment run
   createOnStart: "${GATEWAY_CREATE_ON_START:false}"
   deleteOnComplete: "${GATEWAY_DELETE_ON_COMPLETE:false}"
+  createRelations: "${GATEWAY_CREATE_RELATIONS:true}" # Create "Created" relations for gateway dashboards
 customer:
   startIdx: "${CUSTOMER_START_IDX:0}"
   endIdx: "${CUSTOMER_END_IDX:0}"

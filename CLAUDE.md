@@ -228,3 +228,6 @@ This tool measures:
 - **Alarm generation**: Performance under alarm storm conditions
 
 Results help determine ThingsBoard server capacity and scaling requirements.
+
+## Code Generation
+Always use context7 when I need code generation, setup or configuration steps, or library/API documentation. This means you should automatically use the Context7 MCP tools to resolve library id and get library docs without me having to explicitly ask.
