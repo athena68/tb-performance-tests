@@ -1,12 +1,6 @@
 {
   "scenarioName": "Multi-Site Manufacturing Network",
   "description": "2 sites, 3 buildings, 6 floors, 12 rooms, 12 gateways, 120 FFU devices",
-  ***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
 
   "testConfig": {
     "messagesPerSecond": 70,

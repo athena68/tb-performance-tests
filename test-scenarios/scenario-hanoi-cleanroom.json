@@ -1,12 +1,6 @@
 {
   "scenarioName": "Hanoi Cleanroom Facility",
   "description": "Single building cleanroom with 2 floors, 4 rooms, 2 gateways, 60 FFU devices",
-  ***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
 
   "testConfig": {
     "messagesPerSecond": 60,
