@@ -1,20 +1,19 @@
 {
   "scenarioName": "Hanoi Cleanroom Facility",
   "description": "Single building cleanroom with 2 floors, 4 rooms, 2 gateways, 60 FFU devices",
-
   "testConfig": {
     "messagesPerSecond": 60,
     "durationInSeconds": 86400,
     "payloadType": "EBMPAPST_FFU",
     "warmupEnabled": true
-
+  },
   "site": {
     "name": "Hanoi",
     "type": "Site",
     "latitude": 21.0285,
     "longitude": 105.8542,
     "address": "Hanoi, Vietnam"
-
+  },
   "buildings": [
     {
       "name": "FPT Building Duy Tan",
@@ -59,7 +58,7 @@
                   }
                 }
               ]
-          
+            },
             {
               "name": "Room R502",
               "type": "Room",

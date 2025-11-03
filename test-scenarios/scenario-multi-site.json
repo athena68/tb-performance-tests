@@ -1,22 +1,21 @@
 {
   "scenarioName": "Multi-Site Manufacturing Network",
   "description": "2 sites, 3 buildings, 6 floors, 12 rooms, 12 gateways, 120 FFU devices",
-
   "testConfig": {
     "messagesPerSecond": 70,
     "durationInSeconds": 86400,
     "payloadType": "EBMPAPST_FFU",
     "warmupEnabled": true
-
+  },
   "site": {
     "name": "Vietnam Manufacturing Sites",
     "type": "Site",
     "location": {
       "latitude": 21.0285,
       "longitude": 105.8542
-  
+    },
     "address": "Vietnam"
-
+  },
   "buildings": [
     {
       "name": "Hanoi Building A",
@@ -25,7 +24,7 @@
       "location": {
         "latitude": 21.0285,
         "longitude": 105.8542
-    
+      },
       "address": "456 Hanoi Industrial Zone, Hanoi, Vietnam",
       "email": "hanoi.facility@company.com",
       "phone": "+84-24-3456-7890",
@@ -63,7 +62,7 @@
                   }
                 }
               ]
-          
+            },
             {
               "name": "Room 302",
               "type": "Room",
@@ -94,7 +93,7 @@
               "floorPlan": "https://example.com/floorplans/hn-f3-room-302.png"
             }
           ]
-      
+        },
         {
           "name": "Floor 5",
           "type": "Floor",
@@ -128,7 +127,7 @@
                 }
               ],
               "floorPlan": "https://example.com/floorplans/hn-f5-room-501.png"
-          
+            },
             {
               "name": "Room 502",
               "type": "Room",
@@ -161,7 +160,7 @@
           ]
         }
       ]
-  
+    },
     {
       "name": "HCMC Building B",
       "type": "Building",
@@ -169,7 +168,7 @@
       "location": {
         "latitude": 10.7769,
         "longitude": 106.7009
-    
+      },
       "address": "789 HCMC Industrial Park, District 9, Ho Chi Minh City, Vietnam",
       "email": "hcmc.facility@company.com",
       "phone": "+84-28-1234-5678",
