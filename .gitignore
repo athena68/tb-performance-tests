@@ -30,6 +30,8 @@ pom.xml.versionsBackup
 **/target
 **/Californium.properties
 **/.env
+.env*
+!.env*.example
 **/src/main/resources/models
 
 # Credentials and secrets
