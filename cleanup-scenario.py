@@ -200,14 +200,27 @@ class ThingsBoardCleaner:
 
         return True
 
+def load_credentials(credentials_path: str = 'test-scenarios/credentials.json') -> Optional[Dict]:
+    """Load ThingsBoard credentials from credentials.json file"""
+    try:
+        if os.path.exists(credentials_path):
+            with open(credentials_path, 'r') as f:
+                creds = json.load(f)
+                return creds.get('thingsboard', {})
+    except Exception as e:
+        print(f"⚠ Warning: Failed to load credentials from {credentials_path}: {e}")
+    return None
+
 def main():
     parser = argparse.ArgumentParser(description='Clean up ThingsBoard scenario entities')
-    parser.add_argument('--url', default=os.getenv('REST_URL', 'http://167.99.64.71:8080'),
-                        help='ThingsBoard server URL')
-    parser.add_argument('--username', default=os.getenv('REST_USERNAME', 'tenant@thingsboard.org'),
-                        help='ThingsBoard username')
-    parser.add_argument('--password', default=os.getenv('REST_PASSWORD', 'tenant'),
-                        help='ThingsBoard password')
+    parser.add_argument('--credentials', default='test-scenarios/credentials.json',
+                        help='Path to credentials.json file (default: test-scenarios/credentials.json)')
+    parser.add_argument('--url', default=None,
+                        help='ThingsBoard server URL (overrides credentials.json and env)')
+    parser.add_argument('--username', default=None,
+                        help='ThingsBoard username (overrides credentials.json and env)')
+    parser.add_argument('--password', default=None,
+                        help='ThingsBoard password (overrides credentials.json and env)')
     parser.add_argument('--file', default='/tmp/provisioned_entities.json',
                         help='Path to provisioned_entities.json file')
     parser.add_argument('--pattern', action='store_true',
@@ -221,7 +234,24 @@ def main():
 
     args = parser.parse_args()
 
-    cleaner = ThingsBoardCleaner(args.url, args.username, args.password)
+    # Load credentials from credentials.json
+    creds_config = load_credentials(args.credentials) or {}
+
+    # Credential priority: CLI args > credentials.json > environment variables
+    resolved_url = args.url or creds_config.get('url') or os.getenv('REST_URL')
+    resolved_username = args.username or creds_config.get('username') or os.getenv('REST_USERNAME')
+    resolved_password = args.password or creds_config.get('password') or os.getenv('REST_PASSWORD')
+
+    # Validate that credentials are provided
+    if not resolved_url or not resolved_username or not resolved_password:
+        print("✗ Error: ThingsBoard credentials not provided!")
+        print("  Please provide credentials via one of:")
+        print(f"    1. Credentials file: {args.credentials}")
+        print("    2. Command-line: --url, --username, --password")
+        print("    3. Environment: REST_URL, REST_USERNAME, REST_PASSWORD")
+        sys.exit(1)
+
+    cleaner = ThingsBoardCleaner(resolved_url, resolved_username, resolved_password)
 
     if not cleaner.login():
         sys.exit(1)
