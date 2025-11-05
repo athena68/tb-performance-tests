@@ -213,11 +213,11 @@ class ThingsBoardProvisioner:
             "from": {
                 "entityType": from_type,
                 "id": from_id
-          
+            },
             "to": {
                 "entityType": to_type,
                 "id": to_id
-          
+            },
             "type": relation_type,
             "typeGroup": "COMMON"
         }
@@ -683,15 +683,28 @@ EXIT_AFTER_COMPLETE=true
         print(f"Entity IDs saved to: {output_file}")
         print()
 
+def load_credentials(credentials_path: str = 'test-scenarios/credentials.json') -> Optional[Dict]:
+    """Load ThingsBoard credentials from credentials.json file"""
+    try:
+        if os.path.exists(credentials_path):
+            with open(credentials_path, 'r') as f:
+                creds = json.load(f)
+                return creds.get('thingsboard', {})
+    except Exception as e:
+        print(f"⚠ Warning: Failed to load credentials from {credentials_path}: {e}")
+    return None
+
 def main():
     parser = argparse.ArgumentParser(description='Provision ThingsBoard hierarchy from scenario')
     parser.add_argument('scenario', help='Path to scenario JSON file')
+    parser.add_argument('--credentials', default='test-scenarios/credentials.json',
+                        help='Path to credentials.json file (default: test-scenarios/credentials.json)')
     parser.add_argument('--url', default=None,
-                        help='ThingsBoard server URL (overrides scenario/env)')
+                        help='ThingsBoard server URL (overrides credentials.json and env)')
     parser.add_argument('--username', default=None,
-                        help='ThingsBoard username (overrides scenario/env)')
+                        help='ThingsBoard username (overrides credentials.json and env)')
     parser.add_argument('--password', default=None,
-                        help='ThingsBoard password (overrides scenario/env)')
+                        help='ThingsBoard password (overrides credentials.json and env)')
 
     args = parser.parse_args()
 
@@ -702,11 +715,22 @@ def main():
         print(f"✗ Failed to load scenario file '{args.scenario}': {e}")
         sys.exit(1)
 
-    tb_config = scenario_data.get('thingsboard', {})
+    # Load credentials from credentials.json
+    creds_config = load_credentials(args.credentials) or {}
 
-    resolved_url = args.url or tb_config.get('url') or os.getenv('REST_URL') or DEFAULT_TB_URL
-    resolved_username = args.username or tb_config.get('username') or os.getenv('REST_USERNAME') or DEFAULT_TB_USERNAME
-    resolved_password = args.password or tb_config.get('password') or os.getenv('REST_PASSWORD') or DEFAULT_TB_PASSWORD
+    # Credential priority: CLI args > credentials.json > environment variables > defaults
+    resolved_url = args.url or creds_config.get('url') or os.getenv('REST_URL') or DEFAULT_TB_URL
+    resolved_username = args.username or creds_config.get('username') or os.getenv('REST_USERNAME') or DEFAULT_TB_USERNAME
+    resolved_password = args.password or creds_config.get('password') or os.getenv('REST_PASSWORD') or DEFAULT_TB_PASSWORD
+
+    # Validate that credentials are provided
+    if not resolved_username or not resolved_password:
+        print("✗ Error: ThingsBoard credentials not provided!")
+        print("  Please provide credentials via one of:")
+        print(f"    1. Credentials file: {args.credentials}")
+        print("    2. Command-line: --username, --password")
+        print("    3. Environment: REST_USERNAME, REST_PASSWORD")
+        sys.exit(1)
 
     print(f"Using ThingsBoard endpoint {resolved_url} (user: {resolved_username})")
 

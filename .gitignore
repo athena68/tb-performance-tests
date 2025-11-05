@@ -31,3 +31,6 @@ pom.xml.versionsBackup
 **/Californium.properties
 **/.env
 **/src/main/resources/models
+
+# Credentials and secrets
+test-scenarios/credentials.json
