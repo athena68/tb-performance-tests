@@ -280,9 +280,12 @@ Adjust these parameters to fit your floor plan:
 
 # With custom credentials
 ./provision-scenario.py test-scenarios/scenario-hanoi-cleanroom.json \
-  --url http://167.99.64.71:8080 \
-  --username tenant@thingsboard.org \
-  --password tenant
+  --url https://your-thingsboard-server.com \
+  --username your-email@domain.com \
+  --password your-password
+
+# Or using credentials.json (recommended)
+./provision-scenario.py test-scenarios/scenario-hanoi-cleanroom.json
 ```
 
 ### What Gets Created

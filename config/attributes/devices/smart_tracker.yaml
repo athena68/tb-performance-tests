@@ -1,0 +1,181 @@
+# Smart Tracker Device Attributes Configuration
+# GPS tracking device for vehicles, assets, and personnel
+
+# Device information
+device_info:
+  device_model: ["ST-GPS-01", "ST-GPS-02", "ST-GPS-PRO", "ST-GPS-LITE"]
+  manufacturer: "TrackTech Solutions"
+  firmware_version: ["2.1.0", "2.1.1", "2.2.0"]
+  serial_number:
+    prefix: "ST"
+    format: "{{prefix}}-{{random:10000:99999}}"
+
+  # Device identification
+  device_type: "GPS Tracker"
+  category: "Telemetry"
+  purpose: "Asset Tracking"
+
+# GPS configuration
+gps_config:
+  gps_chipset: ["UBLOX NEO-M8N", "SiRF Star IV", "MediaTek MT3333"]
+  accuracy_meters: [2.5, 3.0, 5.0]  # Typical GPS accuracy
+  time_to_first_fix: ["Cold: 26s", "Warm: 1s", "Hot: <1s"]
+  update_rate_seconds: [10, 30, 60]  # Configurable update intervals
+
+  # Supported systems
+  gps_systems: ["GPS", "GLONASS", "GALILEO", "BeiDou"]
+  augmentation_systems: ["WAAS", "EGNOS", "MSAS"]
+
+# Communication interfaces
+communication:
+  primary_module: ["4G LTE", "5G NR", "LoRaWAN", "NB-IoT"]
+  cellular_bands: ["LTE B1/B3/B5/B7/B8/B20/B28", "5G n1/n3/n5/n7/n8/n20/n28"]
+  fallback_mode: "2G GSM"
+  bluetooth_version: "5.0"
+  wifi_supported: false
+
+  # APN configuration (template)
+  apn_config:
+    primary_apn: "iot.mobile"
+    fallback_apn: "internet"
+    authentication: "none"
+
+# Physical specifications
+physical_specs:
+  dimensions_mm: [85, 65, 25]  # L x W x H
+  weight_grams: 120
+  enclosure_material: "IP67 Polycarbonate"
+  mounting_type: ["Magnetic", "Screw Mount", "Adhesive", "OBD-II Port"]
+  operating_temperature_celsius: "-40 to +85"
+  storage_temperature_celsius: "-40 to +95"
+
+# Power management
+power_config:
+  battery_type: "Li-Ion"
+  battery_capacity_mah: [3000, 5000, 10000]  # Different battery options
+  battery_voltage: 3.7
+  rechargeable: true
+  charging_methods: ["USB-C", "Solar Panel", "Vehicle Power"]
+
+  # Power consumption
+  sleep_current_ua: 10          # Microamps in deep sleep
+  active_current_ma: 50         # Milliamps when active
+  gps_current_ma: 80            # Milliamps when GPS is on
+
+  # Battery life estimates
+  battery_life_days:
+    normal_mode: [7, 14, 30]     # Days based on battery size
+    power_save_mode: [14, 30, 60]
+    emergency_mode: 3
+
+# Sensors and features
+sensors:
+  accelerometer:
+    type: "3-axis MEMS"
+    range_g: ±16
+    resolution_bits: 16
+    shock_detection: true
+
+  temperature_sensor:
+    range_celsius: "-40 to +85"
+    accuracy_celsius: ±1
+    internal: true
+
+  light_sensor:
+    type: "Photoresistor"
+    day_night_detection: true
+
+  tamper_detection:
+    magnetic_tamper: true
+    movement_tamper: true
+    removal_tamper: true
+
+# Features and capabilities
+features:
+  geofencing:
+    max_geofences: 100
+    polygon_support: true
+    circular_geofences: true
+
+  alerts:
+    speed_alert: true
+    geofence_alert: true
+    low_battery_alert: true
+    tamper_alert: true
+    sos_button: false
+
+  data_logging:
+    internal_storage_mb: 16
+    offline_storage_days: 7
+    data_compression: true
+
+  remote_commands:
+    reboot_command: true
+    update_interval_command: true
+    firmware_update_ota: true
+
+# Security and authentication
+security:
+  device_authentication: "IMEI-based"
+  data_encryption: "AES-256"
+  tls_version: "1.3"
+  certificate_management: "Auto-renew"
+
+  # Anti-theft features
+  anti_jamming: true
+  signal_strength_monitoring: true
+  unauthorized_removal_detection: true
+
+# Compliance and certification
+compliance:
+  ce_certified: true
+  fcc_certified: true
+  ic_certified: true
+  rohs_compliant: true
+  reach_compliant: true
+
+  # Industry standards
+  automotive_grade: "AEC-Q100"
+  industrial_grade: "IP67"
+  military_grade: false
+
+# Maintenance and warranty
+maintenance:
+  firmware_update_method: ["OTA", "USB"]
+  update_frequency_months: 6
+  diagnostic_support: true
+  remote_diagnostics: true
+
+  warranty:
+    standard_years: 2
+    extended_years_available: 5
+    coverage: "Defects and Workmanship"
+
+# Application specific
+application:
+  primary_use_cases: ["Vehicle Tracking", "Asset Management", "Personnel Tracking", "Fleet Management"]
+  industry_verticals: ["Logistics", "Construction", "Agriculture", "Public Safety", "Healthcare"]
+
+# Network protocols
+protocols:
+  primary_protocol: "MQTT"
+  supported_protocols: ["MQTT", "HTTP", "CoAP", "TCP"]
+  message_format: "JSON"
+  qos_levels: [0, 1, 2]
+
+# Configuration templates
+configuration_templates:
+  vehicle_tracking:
+    update_interval: 30
+    sleep_when_stationary: true
+    ignition_detection: true
+
+  asset_tracking:
+    update_interval: 3600
+    movement_based_updates: true
+    geofence_only_mode: false
+
+  personnel_tracking:
+    update_interval: 60
+    panic_button: false
+    man_down_detection: true

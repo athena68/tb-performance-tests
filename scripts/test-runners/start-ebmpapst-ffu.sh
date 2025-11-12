@@ -29,10 +29,17 @@ else
     echo "Warning: .env.ebmpapst not found. Using default values."
     echo ""
     echo "Default Configuration:"
-    export REST_URL=http://167.99.64.71:8080
-    export MQTT_HOST=167.99.64.71
-    export REST_USERNAME=tenant@thingsboard.org
-    export REST_PASSWORD=tenant
+    # Set ThingsBoard connection details from environment or use defaults
+    export REST_URL=${REST_URL:-"http://localhost:8080"}
+    export MQTT_HOST=${MQTT_HOST:-"localhost"}
+    # Set authentication details from environment
+    export REST_USERNAME=${REST_USERNAME:-""}
+    export REST_PASSWORD=${REST_PASSWORD:-""}
+
+    if [[ -z "$REST_USERNAME" || -z "$REST_PASSWORD" ]]; then
+        echo "❌ Error: REST_USERNAME and REST_PASSWORD must be set in environment or .env file"
+        exit 1
+    fi
     export TEST_PAYLOAD_TYPE=EBMPAPST_FFU
     export DEVICE_START_IDX=0
     export DEVICE_END_IDX=50

@@ -36,8 +36,8 @@ and put next content into the text file (modify it according to your test goals)
 REST_URL=http://IP_ADDRESS_OF_TB_INSTANCE:8080
 # IP_ADDRESS_OF_TB_INSTANCE is your local IP address if you run ThingsBoard on your dev machine in docker
 # Port should be modified as well if needed 
-REST_USERNAME=tenant@thingsboard.org
-REST_PASSWORD=tenant
+REST_USERNAME=your-email@domain.com
+REST_PASSWORD=your-password
 REST_POOL_SIZE=4
 
 MQTT_HOST=IP_ADDRESS_OF_TB_INSTANCE
@@ -93,8 +93,8 @@ RULE_CHAIN_NAME=root_rule_chain_ce.json
 Where: 
     
 - `REST_URL`                     - Rest URL of the TB instance. Default: http://localhost:8080
-- `REST_USERNAME`                - Login of the user. Default: tenant@thingsboard.org  
-- `REST_PASSWORD`                - Password of the user. Default: tenant
+- `REST_USERNAME`                - Login of the user. Default: your-email@domain.com
+- `REST_PASSWORD`                - Password of the user. Default: your-password
 - `MQTT_HOST`                    - URL of the ThingsBoard MQTT broker. Default: localhost
 - `MQTT_PORT`                    - Port of the ThingsBoard MQTT broker. Default: 1883
 - `DEVICE_API`                   - Use MQTT, HTTP or LWM2M Device API for send messages. Default: MQTT
@@ -124,8 +124,8 @@ docker run -it --rm --network host --name tb-perf-test \
            --pull always --log-driver none \
            --env REST_URL=http://127.0.0.1:8080 \
            --env MQTT_HOST=127.0.0.1 \
-           --env REST_USERNAME=tenant@thingsboard.org \
-           --env REST_PASSWORD=tenant \
+           --env REST_USERNAME=your-email@domain.com \
+           --env REST_PASSWORD=your-password \
            --env DEVICE_END_IDX=1000 \
            --env MESSAGES_PER_SECOND=50 \
            --env DURATION_IN_SECONDS=86400 \

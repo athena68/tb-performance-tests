@@ -5,9 +5,14 @@ if [ -f .env.ebmpapst-gateway ]; then
     export $(cat .env.ebmpapst-gateway | grep -v '^#' | sed 's/#.*$//' | sed 's/[[:space:]]*$//' | grep -v '^$' | xargs)
 fi
 
-REST_URL=${REST_URL:-http://167.99.64.71:8080}
-REST_USERNAME=${REST_USERNAME:-tenant@thingsboard.org}
-REST_PASSWORD=${REST_PASSWORD:-tenant}
+REST_URL=${REST_URL:-"http://localhost:8080"}
+REST_USERNAME=${REST_USERNAME:-""}
+REST_PASSWORD=${REST_PASSWORD:-""}
+
+if [[ -z "$REST_USERNAME" || -z "$REST_PASSWORD" ]]; then
+    echo "❌ Error: REST_USERNAME and REST_PASSWORD must be set in environment or .env file"
+    exit 1
+fi
 
 # Login
 TOKEN=$(curl -s -X POST "$REST_URL/api/auth/login" \

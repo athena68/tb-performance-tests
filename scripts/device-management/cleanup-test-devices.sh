@@ -26,9 +26,14 @@ elif [ -f .env.ebmpapst-gateway ]; then
 fi
 
 # Default values if not set
-REST_URL=${REST_URL:-http://167.99.64.71:8080}
-REST_USERNAME=${REST_USERNAME:-tenant@thingsboard.org}
-REST_PASSWORD=${REST_PASSWORD:-tenant}
+REST_URL=${REST_URL:-"http://localhost:8080"}
+REST_USERNAME=${REST_USERNAME:-""}
+REST_PASSWORD=${REST_PASSWORD:-""}
+
+if [[ -z "$REST_USERNAME" || -z "$REST_PASSWORD" ]]; then
+    echo "❌ Error: REST_USERNAME and REST_PASSWORD must be set in environment or .env file"
+    exit 1
+fi
 
 echo "Configuration:"
 echo "  ThingsBoard Server: $REST_URL"

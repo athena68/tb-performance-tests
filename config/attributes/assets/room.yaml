@@ -1,0 +1,66 @@
+# Room Asset Attributes Configuration
+# Attributes for Room-level assets in ThingsBoard hierarchy
+
+default:
+  # Room classification (from scenario)
+  classification: null             # Should be provided from scenario (ISO 5, ISO 6, etc.)
+  area_sqm: null                   # Should be provided from scenario
+
+  # Room specifications
+  room_type: "Cleanroom"
+  ceiling_height_m: 3.0
+  occupancy_limit: 10
+  emergency_exit_count: 2
+
+  # Environmental parameters
+  temperature_setpoint: 22         # Celsius
+  humidity_setpoint: 45            # Percentage
+  pressure_differential_pa: 10     # Positive pressure relative to adjacent areas
+
+  # Air quality requirements
+  air_changes_per_hour: 20
+  particle_count_limit: null       # Set based on ISO classification
+  filter_efficiency: "HEPA H14"
+  return_air_ratio: 0.3
+
+  # Cleanroom-specific
+  garment_requirements: "Full coveralls"
+  entry_procedure: "Air shower"
+  material_transfer: "Pass-through"
+  cleaning_frequency: "Daily"
+
+  # Safety and compliance
+  emergency_eyewash: false
+  emergency_shower: false
+  fire_extinguisher_type: "CO2"
+  chemical_storage: false
+
+# Override values based on ISO classification
+overrides:
+  "ISO 5":
+    air_changes_per_hour: 400      # High for ISO 5
+    particle_count_limit: 3520     # particles ≥0.5μm per m³
+    pressure_differential_pa: 15
+    garment_requirements: "Full bunny suit"
+    entry_procedure: "Air shower + gowning room"
+
+  "ISO 6":
+    air_changes_per_hour: 200
+    particle_count_limit: 35200    # particles ≥0.5μm per m³
+    pressure_differential_pa: 12
+    garment_requirements: "Full coveralls + hood"
+    entry_procedure: "Air shower"
+
+  "ISO 7":
+    air_changes_per_hour: 60
+    particle_count_limit: 352000   # particles ≥0.5μm per m³
+    pressure_differential_pa: 10
+    garment_requirements: "Full coveralls"
+    entry_procedure: "Gowning room"
+
+  "ISO 8":
+    air_changes_per_hour: 20
+    particle_count_limit: 3520000  # particles ≥0.5μm per m³
+    pressure_differential_pa: 5
+    garment_requirements: "Lab coat"
+    entry_procedure: "Standard entry"

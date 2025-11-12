@@ -1,0 +1,124 @@
+# Staging Environment Site Attributes Configuration
+# Pre-production testing environment
+
+# Staging-specific configuration
+default:
+  # Staging site information (will be merged with base config)
+  description: "Staging Test Environment"
+  site_manager: "Staging Manager"
+  contact_email: "staging@company.com"
+  contact_phone: "+1-555-STAGE-MGR"
+
+  # Staging environment specific
+  environment: "staging"
+  debug_mode: true                  # Debugging enabled in staging
+  test_data: false                  # Use production-like data
+  high_availability: true           # Mirror production setup
+
+  # Production-like certification for testing
+  certification: ["ISO 9001", "ISO 14001", "STAGING-ONLY"]
+  operating_hours: "24/7"
+
+  # Staging infrastructure
+  total_buildings: null             # Calculated from scenario
+  total_area_sqm: null             # Calculated from scenario
+  parking_spaces: 200
+  has_security: true
+  monitored_24x7: true
+
+  # Staging compliance (production-like)
+  audit_logging: true
+  data_encryption: true
+  backup_enabled: true
+  disaster_recovery: true
+
+# Staging environment overrides
+environment_overrides:
+  staging:
+    debug_enabled: true
+    mock_gps: false                  # Use real GPS data
+    accelerated_time: false          # Real-time processing
+    auto_cleanup: true               # Cleanup old test data
+    log_level: "INFO"
+    data_retention_days: 90          # 3 months
+    compliance_mode: "production-like"
+
+  pre_production:
+    debug_enabled: true
+    mock_gps: false
+    accelerated_time: false
+    auto_cleanup: false
+    log_level: "WARN"
+    data_retention_days: 180         # 6 months
+    compliance_mode: "strict"
+
+# Staging-specific sites
+predefined_sites:
+  staging_hanoi:
+    address: "Staging Environment - Hanoi"
+    latitude: 21.0285
+    longitude: 105.8542
+    description: "Staging facility for Hanoi deployment"
+    timezone: "Asia/Ho_Chi_Minh"
+    compliance_region: "STAGING-APAC"
+
+  staging_hcmc:
+    address: "Staging Environment - HCMC"
+    latitude: 10.7769
+    longitude: 106.7009
+    description: "Staging facility for HCMC deployment"
+    timezone: "Asia/Ho_Chi_Minh"
+    compliance_region: "STAGING-APAC"
+
+  integration_test:
+    address: "Integration Test Facility"
+    latitude: 1.3521
+    longitude: 103.8198
+    description: "Integration and performance testing"
+    timezone: "Asia/Singapore"
+    compliance_region: "STAGING-APAC"
+
+# Staging security and compliance
+security_config:
+  physical_security:
+    access_control: "Card Only"
+    surveillance: "Limited CCTV"
+    security_personnel: false
+    visitor_management: true
+
+  cyber_security:
+    network_segmentation: true
+    firewall_configured: true
+    intrusion_detection: true
+    security_monitoring: true
+
+  data_protection:
+    gdpr_compliant: true
+    data_classification: "Internal"
+    access_logging: true
+    encryption_at_rest: true
+
+# Staging monitoring
+monitoring_config:
+  performance_monitoring: true
+  uptime_monitoring: true
+  capacity_monitoring: true
+  security_monitoring: true
+
+  alerting:
+    email_alerts: true
+    sms_alerts: false
+    slack_integration: true
+    escalation_policy: false
+
+# Staging data management
+data_config:
+  data_anonymization: true
+  synthetic_data_generation: true
+  data_validation: true
+  performance_testing: true
+
+  # Database configuration
+  backup_frequency: "daily"
+  backup_retention: "30 days"
+  point_in_time_recovery: true
