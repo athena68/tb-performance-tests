@@ -1,0 +1,8 @@
+# Gateway Device Attributes Configuration
+# Only client attributes provided by gateway device
+
+# Client Attributes (provided by gateway device)
+client_attributes:
+  firmware_version: null    # Will be provided by gateway device
+  serial_number: null       # Will be provided by gateway device
+  mac_address: null         # Will be provided by gateway device

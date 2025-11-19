@@ -6,9 +6,9 @@
 set -e
 
 # Configuration from .env.ebmpapst-gateway
-REST_URL="${REST_URL:-https://demo.thingsboard.io}"
-REST_USERNAME="${REST_USERNAME:-tuannt7@fpt.com}"
-REST_PASSWORD="${REST_PASSWORD:-Fpt2025}"
+REST_URL="${REST_URL:-}"
+REST_USERNAME="${REST_USERNAME:-}"
+REST_PASSWORD="${REST_PASSWORD:-}"
 
 # Device and gateway configuration
 GATEWAY_START_IDX=0
@@ -19,6 +19,18 @@ DEVICE_END_IDX=60
 echo "========================================="
 echo "Gateway-Device Relation Creator"
 echo "========================================="
+
+# Validate required environment variables
+if [ -z "$REST_URL" ] || [ -z "$REST_USERNAME" ] || [ -z "$REST_PASSWORD" ]; then
+    echo "ERROR: Missing required environment variables:"
+    echo "  - REST_URL: $REST_URL"
+    echo "  - REST_USERNAME: $REST_USERNAME"
+    echo "  - REST_PASSWORD: [${#REST_PASSWORD} chars]"
+    echo ""
+    echo "Please set these environment variables or source a .env file"
+    exit 1
+fi
+
 echo "REST URL: $REST_URL"
 echo "Username: $REST_USERNAME"
 echo "Gateways: $GATEWAY_START_IDX to $GATEWAY_END_IDX"

@@ -16,42 +16,57 @@ from typing import Dict, List, Optional
 # Add config directory to path for attribute loading
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'config'))
 
-# Load default credentials from credentials.json
-DEFAULT_CREDENTIALS_FILE = os.path.join(os.path.dirname(__file__), 'credentials.json')
-DEFAULT_TB_URL = None
-DEFAULT_TB_USERNAME = None
-DEFAULT_TB_PASSWORD = None
+# Default credentials file location (matching cleanup script)
+DEFAULT_CREDENTIALS_FILE = '../credentials.json'
 
-def load_default_credentials():
-    """Load default ThingsBoard credentials from credentials.json"""
-    global DEFAULT_TB_URL, DEFAULT_TB_USERNAME, DEFAULT_TB_PASSWORD
+def load_credentials(creds_file: str = None) -> Dict[str, str]:
+    """Load credentials from JSON file with user-friendly fallbacks (reused from cleanup script)"""
+    if creds_file is None:
+        creds_file = DEFAULT_CREDENTIALS_FILE
 
-    if os.path.exists(DEFAULT_CREDENTIALS_FILE):
-        try:
-            with open(DEFAULT_CREDENTIALS_FILE, 'r') as f:
-                creds = json.load(f)
-                tb_creds = creds.get('thingsboard', {})
-                DEFAULT_TB_URL = tb_creds.get('url', 'https://demo.thingsboard.io/').rstrip('/')
-                DEFAULT_TB_USERNAME = tb_creds.get('username')
-                DEFAULT_TB_PASSWORD = tb_creds.get('password')
+    if not os.path.exists(creds_file):
+        # Create helpful error message with example
+        print(f"❌ Credentials file not found: {creds_file}")
+        print(f"\n📝 Please create a credentials file at: {creds_file}")
+        print(f" with the following content:\n")
 
-                if not DEFAULT_TB_USERNAME or not DEFAULT_TB_PASSWORD:
-                    raise ValueError(f"Missing username or password in {DEFAULT_CREDENTIALS_FILE}")
-        except Exception as e:
-            print(f"❌ Error: Could not load credentials file: {e}")
-            print(f"  Please fix {DEFAULT_CREDENTIALS_FILE} or use --credentials parameter")
-            DEFAULT_TB_URL = None
-            DEFAULT_TB_USERNAME = None
-            DEFAULT_TB_PASSWORD = None
-    else:
-        print(f"❌ Error: Credentials file not found at {DEFAULT_CREDENTIALS_FILE}")
-        print(f"  Please create {DEFAULT_CREDENTIALS_FILE} or use --credentials parameter")
-        DEFAULT_TB_URL = None
-        DEFAULT_TB_USERNAME = None
-        DEFAULT_TB_PASSWORD = None
+        example_content = f'''{{
+  "thingsboard": {{
+    "url": "https://your-thingsboard-server.com",
+    "username": "your-email@domain.com",
+    "password": "your-password"
+  }}
+}}'''
 
-# Load credentials at module import
-load_default_credentials()
+        print(example_content)
+        print(f"\n⚠️  For security, make sure the file is NOT committed to version control")
+        print(f"   Add '{creds_file.split('/')[-1]}' to your .gitignore file")
+        raise FileNotFoundError(f"Credentials file not found: {creds_file}")
+
+    try:
+        with open(creds_file, 'r') as f:
+            creds = json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"❌ Invalid JSON format in credentials file: {e}")
+        raise ValueError(f"Invalid JSON format in {creds_file}: {e}")
+
+    tb_creds = creds.get('thingsboard', {})
+    if not tb_creds:
+        print(f"❌ No 'thingsboard' section found in {creds_file}")
+        print(f"\n📝 Your credentials file should have a 'thingsboard' section:")
+        print(f'"thingsboard": {"url": "...", "username": "...", "password": "..."}')
+        raise ValueError(f"No 'thingsboard' section found in {creds_file}")
+
+    required_fields = ['url', 'username', 'password']
+    missing = [field for field in required_fields if not tb_creds.get(field)]
+    if missing:
+        print(f"❌ Missing required fields in {creds_file}: {missing}")
+        print(f"\n📝 Please add these fields to your 'thingsboard' section:")
+        for field in missing:
+            print(f'    "{field}": "your_{field}"')
+        raise ValueError(f"Missing required fields in {creds_file}: {missing}")
+
+    return tb_creds
 
 class ThingsBoardProvisioner:
     def __init__(self, url: str, username: str, password: str, use_configurable_attrs: bool = True):
@@ -139,10 +154,7 @@ class ThingsBoardProvisioner:
                 }
             }
 
-            # Add attributes if any
-            if attributes:
-                asset_payload["attributes"] = attributes
-
+            # Create asset first (without attributes)
             response = requests.post(
                 f"{self.url}/api/asset",
                 headers=self._get_headers(),
@@ -185,6 +197,12 @@ class ThingsBoardProvisioner:
                     if response.status_code not in [200, 201]:
                         print(f"  Debug - Retry failed: {response.text}")
                         return None
+
+                    retry_asset_id = response.json()['id']['id']
+                    # Set attributes for recreated asset
+                    if attributes and self.use_configurable_attrs:
+                        self._set_asset_attributes(retry_asset_id, attributes)
+                    return retry_asset_id
                 else:
                     print(f"  Debug - Request payload: {json.dumps(asset_payload, indent=2)}")
                     print(f"  Debug - Response: {response.text}")
@@ -193,8 +211,13 @@ class ThingsBoardProvisioner:
                 print(f"  Debug - HTTP {response.status_code} - Request payload: {json.dumps(asset_payload, indent=2)}")
                 print(f"  Debug - HTTP {response.status_code} - Response: {response.text}")
                 return None
+
             asset_id = response.json()['id']['id']
             print(f"✓ Created asset: {name} (Type: {asset_type})")
+
+            # Set attributes using separate API call if we have any
+            if attributes and self.use_configurable_attrs:
+                self._set_asset_attributes(asset_id, attributes)
 
             # Log some key attributes
             if attributes:
@@ -205,6 +228,34 @@ class ThingsBoardProvisioner:
         except Exception as e:
             print(f"✗ Failed to create asset {name}: {e}")
             return None
+
+    def _set_asset_attributes(self, asset_id: str, attributes: Dict[str, any]) -> bool:
+        """Set server attributes for an asset using ThingsBoard v4 API (original working method)"""
+        try:
+            # Filter out null values which ThingsBoard doesn't accept
+            filtered_attributes = {k: v for k, v in attributes.items() if v is not None}
+
+            if not filtered_attributes:
+                print(f"  ⚠ No non-null attributes to set")
+                return True
+
+            # Use the original working endpoint format from the legacy script
+            endpoint = f"{self.url}/api/plugins/telemetry/ASSET/{asset_id}/attributes/SERVER_SCOPE"
+
+            response = requests.post(
+                endpoint,
+                headers=self._get_headers(),
+                json=filtered_attributes
+            )
+            if response.status_code == 200:
+                print(f"  ✓ Set {len(filtered_attributes)} server attributes for asset using legacy API")
+                return True
+            else:
+                print(f"  ⚠ Failed to set attributes: {response.status_code} - {response.text}")
+                return False
+        except Exception as e:
+            print(f"  ⚠ Error setting asset attributes: {e}")
+            return False
 
     def create_device(self, name: str, device_type: str, label: str, device_index: int = 0, context: Dict = None) -> Optional[str]:
         """Create device with configurable attributes"""
@@ -602,30 +653,99 @@ class ThingsBoardProvisioner:
         return True
 
     def generate_env_file(self) -> str:
-        """Generate .env file for gateway configuration"""
+        """Generate .env file for gateway configuration using actual connection details"""
         if not hasattr(self, 'scenario'):
             return ""
 
+        # Extract connection details from current ThingsBoard connection
+        url = self.url.replace('https://', '').replace('http://', '').rstrip('/')
+        mqtt_host = url
+        if ':' in url:
+            # Split hostname and port if present
+            parts = url.split(':')
+            mqtt_host = parts[0]
+            port = int(parts[1]) if len(parts) > 1 else 443
+        else:
+            port = 443 if self.url.startswith('https://') else 80
+
         env_content = []
-        env_content.append("# Generated by provision-scenario-v2.py")
-        env_content.append("# Gateway configuration for ebmpapst FFU test")
+        env_content.append(f"# ebmpapst FFU Performance Test - Gateway Mode Configuration")
+        env_content.append(f"# Auto-generated from scenario: {self.scenario.get('scenarioName', self.scenario.get('name', 'Unknown'))}")
+        env_content.append(f"# Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}")
         env_content.append("")
 
-        # ThingsBoard connection
-        env_content.append("TB_HOST=your-thingsboard-host")
-        env_content.append("TB_PORT=1883")
-        env_content.append("TB_USERNAME=gateway")
+        env_content.append("# ThingsBoard Server Configuration")
+        env_content.append(f"REST_URL={self.url}")
+        env_content.append(f"REST_USERNAME={self.username}")
+        env_content.append("REST_PASSWORD=REPLACE_WITH_ACTUAL_PASSWORD")
+        env_content.append("REST_POOL_SIZE=4")
         env_content.append("")
 
-        # Gateway device tokens (would need to be fetched from ThingsBoard)
-        for gateway_id in self.created_entities['gateways'][:3]:  # Limit to first 3
-            env_content.append(f"GATEWAY_{len(env_content)-5}_TOKEN=your_token_here")
-
+        env_content.append("# MQTT Broker Configuration")
+        env_content.append(f"MQTT_HOST={mqtt_host}")
+        env_content.append("MQTT_PORT=1883")
         env_content.append("")
-        env_content.append("# Device configuration")
-        env_content.append("DEVICE_START_INDEX=0")
-        env_content.append(f"DEVICE_END_INDEX={len(self.created_entities['devices']) - 1}")
-        env_content.append("MESSAGES_PER_SECOND=10")
+
+        env_content.append("# SSL Configuration")
+        env_content.append("MQTT_SSL_ENABLED=false")
+        env_content.append("MQTT_SSL_KEY_STORE=")
+        env_content.append("MQTT_SSL_KEY_STORE_PASSWORD=")
+        env_content.append("")
+
+        env_content.append("# *** CRITICAL: Use GATEWAY mode ***")
+        env_content.append("TEST_API=gateway")
+        env_content.append("")
+
+        env_content.append("# Device API Protocol (MQTT for gateway)")
+        env_content.append("DEVICE_API=MQTT")
+        env_content.append("")
+
+        env_content.append("# Gateway Configuration")
+        env_content.append(f"GATEWAY_START_IDX=0")
+        env_content.append(f"GATEWAY_END_IDX={len(self.created_entities['gateways'])}")
+        env_content.append("GATEWAY_CREATE_ON_START=false  # Already created by provisioner")
+        env_content.append("GATEWAY_DELETE_ON_COMPLETE=false")
+        env_content.append("")
+
+        env_content.append("# Device Configuration")
+        env_content.append("DEVICE_START_IDX=0")
+        env_content.append(f"DEVICE_END_INDEX={len(self.created_entities['devices'])}")
+        env_content.append("DEVICE_CREATE_ON_START=false   # IMPORTANT: Let gateway auto-provision devices!")
+        env_content.append("DEVICE_DELETE_ON_COMPLETE=false")
+        env_content.append("")
+
+        env_content.append("# Test Payload Type")
+        env_content.append("TEST_PAYLOAD_TYPE=EBMPAPST_FFU")
+        env_content.append("")
+
+        env_content.append("# Test Execution Configuration")
+        env_content.append("WARMUP_ENABLED=true")
+        env_content.append("TEST_ENABLED=true")
+        env_content.append("")
+
+        env_content.append("# Message Rate Configuration")
+        env_content.append("MESSAGES_PER_SECOND=60")
+        env_content.append("DURATION_IN_SECONDS=86400")
+        env_content.append("")
+
+        env_content.append("# Alarm Configuration")
+        env_content.append("ALARMS_PER_SECOND=2")
+        env_content.append("ALARM_STORM_START_SECOND=60")
+        env_content.append("ALARM_STORM_END_SECOND=240")
+        env_content.append("")
+
+        env_content.append("# Rule Chain Configuration")
+        env_content.append("UPDATE_ROOT_RULE_CHAIN=false")
+        env_content.append("REVERT_ROOT_RULE_CHAIN=false")
+        env_content.append("RULE_CHAIN_NAME=root_rule_chain_ce.json")
+        env_content.append("")
+
+        env_content.append("# Test Execution Mode")
+        env_content.append("TEST_SEQUENTIAL=false")
+        env_content.append("")
+
+        env_content.append("# Exit Configuration")
+        env_content.append("EXIT_AFTER_COMPLETE=true")
 
         return "\n".join(env_content)
 
@@ -633,13 +753,48 @@ class ThingsBoardProvisioner:
 def main():
     parser = argparse.ArgumentParser(description='Enhanced ThingsBoard Scenario Provisioner')
     parser.add_argument('scenario_file', help='JSON scenario file')
-    parser.add_argument('--url', default=DEFAULT_TB_URL, help='ThingsBoard URL')
-    parser.add_argument('--username', default=DEFAULT_TB_USERNAME, help='ThingsBoard username')
-    parser.add_argument('--password', default=DEFAULT_TB_PASSWORD, help='ThingsBoard password')
+    parser.add_argument('--url', help='ThingsBoard URL (required if not using --credentials)')
+    parser.add_argument('--username', help='ThingsBoard username (required if not using --credentials)')
+    parser.add_argument('--password', help='ThingsBoard password (required if not using --credentials)')
+    parser.add_argument('--credentials', help='Credentials JSON file path')
     parser.add_argument('--no-config-attrs', action='store_true', help='Disable configurable attributes (use hardcoded fallbacks)')
     parser.add_argument('--env-file', help='Save .env file for gateway configuration')
 
     args = parser.parse_args()
+
+    # Handle credentials (matching cleanup script approach)
+    url = username = password = None  # Initialize variables
+
+    try:
+        if args.credentials:
+            creds = load_credentials(args.credentials)
+            url = creds['url']
+            username = creds['username']
+            password = creds['password']
+        elif args.url and args.username and args.password:
+            # Use command line credentials
+            url = args.url
+            username = args.username
+            password = args.password
+        else:
+            # Try to load from default credentials file
+            creds = load_credentials()
+            url = creds['url']
+            username = creds['username']
+            password = creds['password']
+    except Exception as e:
+        print(f"❌ Credentials error: {e}")
+        print("Please provide credentials via:")
+        print("  1. --credentials <file>")
+        print("  2. --url <url> --username <user> --password <pass>")
+        print(f"  3. Create {DEFAULT_CREDENTIALS_FILE}")
+        return 1
+
+    
+    # Ensure credentials were loaded successfully
+    if not all([url, username, password]):
+        print("❌ Failed to load credentials properly")
+        return 1
 
     # Check if scenario file exists
     if not os.path.exists(args.scenario_file):
@@ -648,9 +803,9 @@ def main():
 
     # Create provisioner
     provisioner = ThingsBoardProvisioner(
-        args.url,
-        args.username,
-        args.password,
+        url,
+        username,
+        password,
         use_configurable_attrs=not args.no_config_attrs
     )
 

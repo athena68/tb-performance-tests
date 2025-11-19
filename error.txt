@@ -1,0 +1,89 @@
+11:13:34.327 [main] INFO  o.t.tools.PerformanceTestApplication - Starting PerformanceTestApplication using Java 17.0.16 with PID 22527 (/home/tuan/ThingsboardSetup/performance-tests/target/classes started by tuan in /home/tuan/ThingsboardSetup/performance-tests)
+11:13:34.329 [main] INFO  o.t.tools.PerformanceTestApplication - No active profile set, falling back to 1 default profile: "default"
+11:13:35.914 [main] INFO  o.t.t.service.shared.AbstractAPITest - Initialized with deviceStartIdx [0], deviceEndIdx [1000]
+11:13:35.951 [main] INFO  o.t.t.service.shared.AbstractAPITest - Initialized with deviceStartIdx [0], deviceEndIdx [1000]
+11:13:35.953 [main] INFO  o.t.t.s.gateway.MqttGatewayAPITest - Initialized with gatewayStartIdx [0], gatewayEndIdx [10]
+11:13:36.224 [main] INFO  o.t.tools.PerformanceTestApplication - Started PerformanceTestApplication in 2.178 seconds (process running for 2.537)
+11:13:36.226 [main] INFO  o.t.tools.PerformanceTestRunner - Running test
+11:13:37.064 [main] INFO  o.t.t.s.d.DeviceProfileManagerImpl - Device profile [EBMPAPST_FFU] already exists
+11:13:37.307 [main] WARN  o.t.t.s.d.DefaultDashboardManager - [alarms.json] Failed to load dashboard
+com.fasterxml.jackson.core.JsonParseException: Unexpected character ('"' (code 34)): was expecting comma to separate Object entries
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 19, column: 13]
+        at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2648)
+        at com.fasterxml.jackson.core.base.ParserMinimalBase._reportUnexpectedChar(ParserMinimalBase.java:685)
+        at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextFieldName(UTF8StreamJsonParser.java:1021)
+        at com.fasterxml.jackson.databind.deser.std.BaseNodeDeserializer._deserializeContainerNoRecursion(JsonNodeDeserializer.java:539)
+        at com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer.deserialize(JsonNodeDeserializer.java:100)
+        at com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer.deserialize(JsonNodeDeserializer.java:25)
+        at com.fasterxml.jackson.databind.deser.DefaultDeserializationContext.readRootValue(DefaultDeserializationContext.java:342)
+        at com.fasterxml.jackson.databind.ObjectMapper._readTreeAndClose(ObjectMapper.java:4947)
+        at com.fasterxml.jackson.databind.ObjectMapper.readTree(ObjectMapper.java:3260)
+        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.loadDashboard(DefaultDashboardManager.java:102)
+        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.createDashboards(DefaultDashboardManager.java:90)
+        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.createDashboards(DefaultDashboardManager.java:62)
+        at org.thingsboard.tools.service.shared.BaseTestExecutor.runTest(BaseTestExecutor.java:82)
+        at org.thingsboard.tools.PerformanceTestRunner.run(PerformanceTestRunner.java:42)
+        at org.springframework.boot.SpringApplication.lambda$callRunner$4(SpringApplication.java:786)
+        at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:82)
+        at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+        at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:86)
+        at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+        at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:786)
+        at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+        at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
+        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+        at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+        at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+        at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+        at org.thingsboard.tools.PerformanceTestApplication.main(PerformanceTestApplication.java:33)
+11:13:37.310 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+11:13:37.319 [main] ERROR o.s.boot.SpringApplication - Application run failed
+java.lang.RuntimeException: com.fasterxml.jackson.core.JsonParseException: Unexpected character ('"' (code 34)): was expecting comma to separate Object entries
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 19, column: 13]
+        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.loadDashboard(DefaultDashboardManager.java:108)
+        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.createDashboards(DefaultDashboardManager.java:90)
+        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.createDashboards(DefaultDashboardManager.java:62)
+        at org.thingsboard.tools.service.shared.BaseTestExecutor.runTest(BaseTestExecutor.java:82)
+        at org.thingsboard.tools.PerformanceTestRunner.run(PerformanceTestRunner.java:42)
+        at org.springframework.boot.SpringApplication.lambda$callRunner$4(SpringApplication.java:786)
+        at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:82)
+        at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
+        at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:86)
+        at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
+        at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:786)
+        at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+        at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
+        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
+        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+        at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+        at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+        at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+        at org.thingsboard.tools.PerformanceTestApplication.main(PerformanceTestApplication.java:33)
+Caused by: com.fasterxml.jackson.core.JsonParseException: Unexpected character ('"' (code 34)): was expecting comma to separate Object entries
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 19, column: 13]
+        at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2648)
+        at com.fasterxml.jackson.core.base.ParserMinimalBase._reportUnexpectedChar(ParserMinimalBase.java:685)
+        at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextFieldName(UTF8StreamJsonParser.java:1021)
+        at com.fasterxml.jackson.databind.deser.std.BaseNodeDeserializer._deserializeContainerNoRecursion(JsonNodeDeserializer.java:539)
+        at com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer.deserialize(JsonNodeDeserializer.java:100)
+        at com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer.deserialize(JsonNodeDeserializer.java:25)
+        at com.fasterxml.jackson.databind.deser.DefaultDeserializationContext.readRootValue(DefaultDeserializationContext.java:342)
+        at com.fasterxml.jackson.databind.ObjectMapper._readTreeAndClose(ObjectMapper.java:4947)
+        at com.fasterxml.jackson.databind.ObjectMapper.readTree(ObjectMapper.java:3260)
+        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.loadDashboard(DefaultDashboardManager.java:102)
+        ... 24 common frames omitted

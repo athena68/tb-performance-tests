@@ -586,7 +586,7 @@ public class LwM2mFirmwareUpdate extends LwM2mBaseInstanceEnabler {
                 }
                 getLwM2mClient().start();
             }
-       500);
+        }, 500);
     }
 
 //    private void sendReaquest () {

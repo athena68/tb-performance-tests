@@ -255,7 +255,7 @@ public class LwM2mSoftwareManagement extends LwM2mBaseInstanceEnabler {
                 executorService.schedule(() -> {
                     // Activate
                     return ExecuteResponse.success();
-               timeDelay, TimeUnit.MILLISECONDS);
+                }, timeDelay, TimeUnit.MILLISECONDS);
                 //
                 /**
                  * This action activates the software previously successfully installed

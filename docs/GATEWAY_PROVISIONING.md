@@ -201,12 +201,12 @@ TEST_TELEMETRY=true ./start-ebmpapst-gateway.sh
 
 ```bash
 # ThingsBoard Server
-REST_URL=http://167.99.64.71:8080
-REST_USERNAME=tenant@thingsboard.org
-REST_PASSWORD=tenant
+REST_URL=http://your-thingsboard-server.com:8080
+REST_USERNAME=your-username@domain.com
+REST_PASSWORD=your-password
 
 # MQTT Broker
-MQTT_HOST=167.99.64.71
+MQTT_HOST=your-mqtt-broker.com
 MQTT_PORT=1883
 
 # *** CRITICAL: Use GATEWAY mode ***

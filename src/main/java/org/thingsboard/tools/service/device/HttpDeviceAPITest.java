@@ -111,7 +111,7 @@ public class HttpDeviceAPITest extends AbstractAPITest implements DeviceAPITest 
                                     successPublishedCount.incrementAndGet();
                                     log.debug("[{}] Message was successfully published to device: {}", iteration, deviceName);
                                     iterationLatch.countDown();
-                              
+                                },
                                 error -> {
                                     totalFailedPublishedCount.incrementAndGet();
                                     failedPublishedCount.incrementAndGet();

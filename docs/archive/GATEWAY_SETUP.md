@@ -262,7 +262,7 @@ cat .env.ebmpapst-gateway | grep DEVICE_CREATE_ON_START
 # Check REST API credentials
 REST_URL=http://167.99.64.71:8080
 REST_USERNAME=tenant@thingsboard.org
-REST_PASSWORD=tenant
+REST_PASSWORD=your-password
 
 # Check test logs for errors
 mvn spring-boot:run | tee test-gateway.log

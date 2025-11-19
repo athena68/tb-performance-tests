@@ -933,7 +933,7 @@ echo ""
 # .env.cleanroom-dashboard
 REST_URL=http://167.99.64.71:8080
 REST_USERNAME=tenant@thingsboard.org
-REST_PASSWORD=tenant
+REST_PASSWORD=your-password
 
 # Deployment options
 DEPLOY_OPTION_B=false  # Set to true for hierarchical dashboard

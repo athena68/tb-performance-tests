@@ -1,0 +1,8 @@
+# ebmpapst FFU Device Attributes Configuration
+# Only client attributes provided by BLE device
+
+# Client Attributes (provided by BLE device)
+client_attributes:
+  firmware_version: null    # Will be provided by BLE device
+  serial_number: null       # Will be provided by BLE device
+  mac_address: null         # Will be provided by BLE device

@@ -708,7 +708,7 @@ Create file: `src/main/resources/device/profile/ebmpapst_ffu.json`
 export REST_URL=http://127.0.0.1:8080
 export MQTT_HOST=127.0.0.1
 export REST_USERNAME=tenant@thingsboard.org
-export REST_PASSWORD=tenant
+export REST_PASSWORD=your-password
 export TEST_PAYLOAD_TYPE=EBMPAPST_FFU
 export DEVICE_START_IDX=0
 export DEVICE_END_IDX=10

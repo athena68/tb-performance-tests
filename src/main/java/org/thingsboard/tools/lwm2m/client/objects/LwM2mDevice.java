@@ -96,7 +96,7 @@ public class LwM2mDevice extends LwM2mBaseInstanceEnabler {
             public void run() {
                 fireResourcesChange(9);
             }
-       5000, 5000);
+        }, 5000, 5000);
     }
 
     public LwM2mDevice(ScheduledExecutorService executorService, Integer id) {
@@ -184,7 +184,7 @@ public class LwM2mDevice extends LwM2mBaseInstanceEnabler {
                         }
                         getLwM2mClient().start();
                     }
-               500);
+                }, 500);
                 break;
             case 5:
                 getLwM2mClient().triggerRegistrationUpdate();

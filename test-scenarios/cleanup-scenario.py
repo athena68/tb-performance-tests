@@ -15,23 +15,50 @@ from typing import Dict, List, Optional, Tuple
 DEFAULT_CREDENTIALS_FILE = '../credentials.json'
 
 def load_credentials(creds_file: str = None) -> Dict[str, str]:
-    """Load credentials from JSON file"""
+    """Load credentials from JSON file with user-friendly fallbacks"""
     if creds_file is None:
         creds_file = DEFAULT_CREDENTIALS_FILE
 
     if not os.path.exists(creds_file):
+        # Create helpful error message with example
+        print(f"❌ Credentials file not found: {creds_file}")
+        print(f"\n📝 Please create a credentials file at: {creds_file}")
+        print(f" with the following content:\n")
+
+        example_content = f'''{{
+  "thingsboard": {{
+    "url": "https://your-thingsboard-server.com",
+    "username": "your-email@domain.com",
+    "password": "your-password"
+  }}
+}}'''
+
+        print(example_content)
+        print(f"\n⚠️  For security, make sure the file is NOT committed to version control")
+        print(f"   Add '{creds_file.split('/')[-1]}' to your .gitignore file")
         raise FileNotFoundError(f"Credentials file not found: {creds_file}")
 
-    with open(creds_file, 'r') as f:
-        creds = json.load(f)
+    try:
+        with open(creds_file, 'r') as f:
+            creds = json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"❌ Invalid JSON format in credentials file: {e}")
+        raise ValueError(f"Invalid JSON format in {creds_file}: {e}")
 
     tb_creds = creds.get('thingsboard', {})
     if not tb_creds:
+        print(f"❌ No 'thingsboard' section found in {creds_file}")
+        print(f"\n📝 Your credentials file should have a 'thingsboard' section:")
+        print(f'"thingsboard": {"url": "...", "username": "...", "password": "..."}')
         raise ValueError(f"No 'thingsboard' section found in {creds_file}")
 
     required_fields = ['url', 'username', 'password']
     missing = [field for field in required_fields if not tb_creds.get(field)]
     if missing:
+        print(f"❌ Missing required fields in {creds_file}: {missing}")
+        print(f"\n📝 Please add these fields to your 'thingsboard' section:")
+        for field in missing:
+            print(f'    "{field}": "your_{field}"')
         raise ValueError(f"Missing required fields in {creds_file}: {missing}")
 
     return tb_creds

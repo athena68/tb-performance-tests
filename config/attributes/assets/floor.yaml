@@ -1,0 +1,55 @@
+# Floor Asset Attributes Configuration
+# Static attributes for Floor assets
+
+default:
+  floor_type: "Cleanroom Floor"
+  area_type: "Controlled Environment"
+  access_type: "Limited Access"
+  construction_type: "Prefabricated Cleanroom"
+  fire_rating: "Class A"
+  lighting_type: "LED Cleanroom Lighting"
+  hvac_zone: "Independent HVAC Zone"
+  emergency_exits: 2
+  ceiling_height_m: 3.0
+  floor_load_kg_m2: 500
+
+overrides:
+  "ISO 5":
+    cleanroom_class: "ISO 5"
+    particle_limit_0_5um: 3520
+    particle_limit_5_0um: 290
+    air_changes_per_hour: 400
+    pressurization_pa: "+15 to +30"
+    garment_requirements: "Full bunny suit, booties, gloves"
+    entry_procedure: "Air shower required"
+    monitoring_level: "High"
+
+  "ISO 6":
+    cleanroom_class: "ISO 6"
+    particle_limit_0_5um: 35200
+    particle_limit_5_0um: 2900
+    air_changes_per_hour: 200
+    pressurization_pa: "+10 to +15"
+    garment_requirements: "Lab coat, booties, hair cover"
+    entry_procedure: "Gowning room procedure"
+    monitoring_level: "Medium"
+
+  "ISO 7":
+    cleanroom_class: "ISO 7"
+    particle_limit_0_5um: 352000
+    particle_limit_5_0um: 29000
+    air_changes_per_hour: 60
+    pressurization_pa: "+5 to +15"
+    garment_requirements: "Lab coat, booties"
+    entry_procedure: "Standard gowning"
+    monitoring_level: "Low"
+
+  "ISO 8":
+    cleanroom_class: "ISO 8"
+    particle_limit_0_5um: 3520000
+    particle_limit_5_0um: 290000
+    air_changes_per_hour: 20
+    pressurization_pa: "0 to +10"
+    garment_requirements: "Lab coat"
+    entry_procedure: "Standard procedure"
+    monitoring_level: "Low"

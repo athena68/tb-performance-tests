@@ -181,7 +181,7 @@ public abstract class AbstractAPITest {
             } catch (Exception e) {
                 log.error("Failed to run performance iteration {}", iterationNumber.get(), e);
             }
-       0, 1, TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.SECONDS);
         log.info("Awaiting all iteration completion...");
         testDurationLatch.await((long) (testDurationInSec * 1.2), TimeUnit.SECONDS);
         scheduledFuture.cancel(true);
@@ -212,7 +212,7 @@ public abstract class AbstractAPITest {
                 log.info("[{}] [{}] have been removed so far...", typeDevice, count.get());
             } catch (Exception ignored) {
             }
-       0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
+        }, 0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
 
         latch.await();
         logScheduleFuture.cancel(true);
@@ -281,7 +281,7 @@ public abstract class AbstractAPITest {
                 log.info("{} {} have been created so far...", count.get(), isGateway ? "gateways" : "devices");
             } catch (Exception ignored) {
             }
-       0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
+        }, 0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
 
         latch.await();
         logScheduleFuture.cancel(true);

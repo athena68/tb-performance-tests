@@ -155,7 +155,7 @@ public class GatewayRelationManager {
 
         return CompletableFuture.supplyAsync(() -> {
             return createAllGatewayDeviceRelations(gatewayDeviceMap);
-       restClientService.getHttpExecutor());
+        }, restClientService.getHttpExecutor());
     }
 
     /**

@@ -1,0 +1,127 @@
+# ebmpapst FFU Telemetry Data Configuration
+# Only required telemetry data points
+
+# Telemetry data points definition
+data_points:
+  # Operating status
+  operating_status:
+    unit: ""
+    values: ["RUNNING", "WARNING", "STOPPED", "FAULTY"]
+    default: "RUNNING"
+    probabilities:          # Status distribution
+      RUNNING: 0.94
+      WARNING: 0.03
+      STOPPED: 0.02
+      FAULTY: 0.01
+
+  error_code:
+    unit: ""
+    values: [0, 101, 102, 201, 202, 301]
+    mapping:
+      0: "No Error"
+      101: "Motor Overheating"
+      102: "Motor Failure"
+      201: "High Differential Pressure"
+      202: "Filter Blocked"
+      301: "Sensor Failure"
+    default: 0
+
+  warning_code:
+    unit: ""
+    values: [0, 301, 302, 303, 401, 402]
+    mapping:
+      0: "No Warning"
+      301: "High Temperature Warning"
+      302: "Filter Change Due"
+      303: "Low Efficiency Warning"
+      401: "Communication Warning"
+      402: "High Vibration Warning"
+    default: 0
+
+  # Motor and performance telemetry
+  RPM:
+    unit: "RPM"
+    min: 500
+    max: 2000
+    default: 1800
+    persistent: true        # Remember last value
+    variance: 0.05          # 5% variance around setpoint
+
+  airSpeed:
+    unit: "m³/h"
+    min: 500
+    max: 2500
+    default: 2330
+    formula: "fan_curve_lookup(RPM, differential_pressure)"
+    correlation: true        # Correlates with speed and pressure
+
+  energy_consumption:
+    unit: "W"
+    min: 800
+    max: 1600
+    default: 1200
+    formula: "torque * angular_speed / efficiency"
+
+  # Vibration monitoring parameters (ISO 10816 standard for industrial fans)
+  Vibration_5th_harmonic_sum:
+    unit: "mm/s"
+    min: 0.1
+    max: 8.0
+    default: 1.2
+    description: "Sum of 5th harmonic vibration components - indicates blade/fan issues"
+    formula: "sqrt(sum(5th_harmonic_components^2)) * load_factor * speed_factor"
+    alarm_threshold: 4.5       # ISO 10816 Class 2 threshold for fans
+    critical_threshold: 7.0    # Immediate action required
+    correlation:
+      - increases_with: "RPM"
+      - increases_with: "motor_temperature"
+      - increases_with: "operating_hours"
+
+  Vibration_RMS_sum:
+    unit: "mm/s"
+    min: 0.5
+    max: 12.0
+    default: 2.1
+    description: "Overall RMS vibration level - general condition indicator"
+    formula: "sqrt(mean(vibration_signal^2)) * load_factor * speed_factor"
+    alarm_threshold: 7.1       # ISO 10816 Class 2 threshold for fans
+    critical_threshold: 11.0   # Immediate action required
+    correlation:
+      - increases_with: "RPM"
+      - increases_with: "motor_temperature"
+      - increases_with: "energy_consumption"
+
+# Data generation rules
+generation_rules:
+  publish_interval_ms: 1000     # 1 second between messages
+  data_variation:
+    speed_noise: 0.02           # 2% noise
+    vibration_drift: 0.1        # Small vibration changes
+
+# Special device configurations
+special_devices:
+  # Devices that should show alarms
+  alarm_devices:
+    devices: ["DW00000015", "DW00000032", "DW00000047"]
+    config:
+      error_code: 201          # High pressure alarm
+      operating_status: "FAULTY"
+      Vibration_RMS_sum: 8.5    # High vibration
+
+  # Devices with high vibration warnings
+  vibration_warning_devices:
+    devices: ["DW00000022", "DW00000038", "DW00000051"]
+    config:
+      operating_status: "WARNING"
+      Vibration_5th_harmonic_sum: 4.2   # Near alarm threshold
+      Vibration_RMS_sum: 6.8
+      warning_code: 402       # High vibration warning
+
+  # Devices that are stopped
+  stopped_devices:
+    devices: ["DW00000008", "DW00000023", "DW00000041"]
+    config:
+      operating_status: "STOPPED"
+      RPM: 0
+      energy_consumption: 0
+      Vibration_RMS_sum: 0

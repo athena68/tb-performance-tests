@@ -465,7 +465,7 @@ TEST_PAYLOAD_TYPE=FFU
 export REST_URL=http://127.0.0.1:8080
 export MQTT_HOST=127.0.0.1
 export REST_USERNAME=tenant@thingsboard.org
-export REST_PASSWORD=tenant
+export REST_PASSWORD=your-password
 export TEST_PAYLOAD_TYPE=FFU
 export DEVICE_START_IDX=0
 export DEVICE_END_IDX=10
@@ -485,7 +485,7 @@ cat > .env.ffu << EOF
 REST_URL=http://192.168.1.100:8080
 MQTT_HOST=192.168.1.100
 REST_USERNAME=tenant@thingsboard.org
-REST_PASSWORD=tenant
+REST_PASSWORD=your-password
 TEST_PAYLOAD_TYPE=FFU
 DEVICE_START_IDX=0
 DEVICE_END_IDX=100

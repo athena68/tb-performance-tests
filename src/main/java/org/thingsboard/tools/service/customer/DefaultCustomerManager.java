@@ -109,7 +109,7 @@ public class DefaultCustomerManager implements CustomerManager {
                 log.info("{} customers have been created so far...", count.get());
             } catch (Exception ignored) {
             }
-       0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
+        }, 0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
 
         latch.await();
         logScheduleFuture.cancel(true);
@@ -142,7 +142,7 @@ public class DefaultCustomerManager implements CustomerManager {
                 log.info("{} customers have been removed so far...", count.get());
             } catch (Exception ignored) {
             }
-       0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
+        }, 0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
 
         latch.await();
         logScheduleFuture.cancel(true);

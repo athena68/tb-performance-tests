@@ -193,7 +193,7 @@ public class Lwm2mDeviceAPITest extends BaseLwm2mAPITest implements DeviceAPITes
                 log.info("[{}] [{}] [{}] have been created so far...", count.get(), numberPoint.get(), "lwm2m_" + profileName.profileName);
             } catch (Exception ignored) {
             }
-       0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
+        }, 0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
 
         latch.await();
         logScheduleFuture.cancel(true);
@@ -295,7 +295,7 @@ public class Lwm2mDeviceAPITest extends BaseLwm2mAPITest implements DeviceAPITes
                     log.info("[{}] [{}] have been connected so far...", count.get(), "lwm2m_" + mode.modeName);
                 } catch (Exception ignored) {
                 }
-           0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
+            }, 0, DefaultRestClientService.LOG_PAUSE, TimeUnit.SECONDS);
             latch.await();
             logScheduleFuture.cancel(true);
             log.info("Trying to register to coap [{}] lwm2m clients... nextPortNumber [{}]", count, nextPortNumber);

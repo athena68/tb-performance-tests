@@ -36,3 +36,5 @@ pom.xml.versionsBackup
 
 # Credentials and secrets
 test-scenarios/credentials.json
+credentials.json
+scripts/device-management/setup-gateway-credentials.sh

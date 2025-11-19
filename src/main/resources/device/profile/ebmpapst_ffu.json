@@ -11,14 +11,14 @@
   "profileData": {
     "configuration": {
       "type": "DEFAULT"
-  
+    },
     "transportConfiguration": {
       "type": "DEFAULT"
-  
+    },
     "provisionConfiguration": {
       "type": "DISABLED",
       "provisionDeviceSecret": null
-  
+    },
     "alarms": [
       {
         "id": "ebmpapst-diff-pressure-alarm",
@@ -31,7 +31,7 @@
                   "key": {
                     "type": "TIME_SERIES",
                     "key": "differentialPressure"
-                
+                  },
                   "valueType": "NUMERIC",
                   "value": null,
                   "predicate": {
@@ -48,12 +48,12 @@
               "spec": {
                 "type": "SIMPLE"
               }
-          
+            },
             "schedule": null,
             "alarmDetails": "HEPA filter differential pressure critical - filter replacement required",
             "dashboardId": null
           }
-      
+        },
         "clearRule": {
           "condition": {
             "condition": [
@@ -61,7 +61,7 @@
                 "key": {
                   "type": "TIME_SERIES",
                   "key": "differentialPressure"
-              
+                },
                 "valueType": "NUMERIC",
                 "value": null,
                 "predicate": {
@@ -78,14 +78,14 @@
             "spec": {
               "type": "SIMPLE"
             }
-        
+          },
           "schedule": null,
           "alarmDetails": "Filter pressure returned to normal",
           "dashboardId": null
-      
+        },
         "propagate": true,
         "propagateRelationTypes": ["Contains"]
-    
+      },
       {
         "id": "ebmpapst-motor-temp-derating",
         "alarmType": "Motor Temperature Derating",
@@ -97,7 +97,7 @@
                   "key": {
                     "type": "TIME_SERIES",
                     "key": "motorTemperature"
-                
+                  },
                   "valueType": "NUMERIC",
                   "value": null,
                   "predicate": {
@@ -114,12 +114,12 @@
               "spec": {
                 "type": "SIMPLE"
               }
-          
+            },
             "schedule": null,
             "alarmDetails": "Motor temperature in derating zone - performance reduced",
             "dashboardId": null
           }
-      
+        },
         "clearRule": {
           "condition": {
             "condition": [
@@ -127,7 +127,7 @@
                 "key": {
                   "type": "TIME_SERIES",
                   "key": "motorTemperature"
-              
+                },
                 "valueType": "NUMERIC",
                 "value": null,
                 "predicate": {
@@ -144,14 +144,14 @@
             "spec": {
               "type": "SIMPLE"
             }
-        
+          },
           "schedule": null,
           "alarmDetails": null,
           "dashboardId": null
-      
+        },
         "propagate": true,
         "propagateRelationTypes": ["Contains"]
-    
+      },
       {
         "id": "ebmpapst-motor-temp-critical",
         "alarmType": "Motor Temperature Critical",
@@ -163,7 +163,7 @@
                   "key": {
                     "type": "TIME_SERIES",
                     "key": "motorTemperature"
-                
+                  },
                   "valueType": "NUMERIC",
                   "value": null,
                   "predicate": {
@@ -180,12 +180,12 @@
               "spec": {
                 "type": "SIMPLE"
               }
-          
+            },
             "schedule": null,
             "alarmDetails": "Motor temperature critical - automatic shutdown imminent",
             "dashboardId": null
           }
-      
+        },
         "clearRule": {
           "condition": {
             "condition": [
@@ -193,7 +193,7 @@
                 "key": {
                   "type": "TIME_SERIES",
                   "key": "motorTemperature"
-              
+                },
                 "valueType": "NUMERIC",
                 "value": null,
                 "predicate": {
@@ -210,14 +210,14 @@
             "spec": {
               "type": "SIMPLE"
             }
-        
+          },
           "schedule": null,
           "alarmDetails": null,
           "dashboardId": null
-      
+        },
         "propagate": true,
         "propagateRelationTypes": ["Contains"]
-    
+      },
       {
         "id": "ebmpapst-modbus-error",
         "alarmType": "MODBUS Communication Error",
@@ -229,7 +229,7 @@
                   "key": {
                     "type": "TIME_SERIES",
                     "key": "communicationErrors"
-                
+                  },
                   "valueType": "NUMERIC",
                   "value": null,
                   "predicate": {
@@ -246,12 +246,12 @@
               "spec": {
                 "type": "SIMPLE"
               }
-          
+            },
             "schedule": null,
             "alarmDetails": "MODBUS-RTU communication errors detected - check RS485 connection",
             "dashboardId": null
           }
-      
+        },
         "clearRule": {
           "condition": {
             "condition": [
@@ -259,7 +259,7 @@
                 "key": {
                   "type": "TIME_SERIES",
                   "key": "communicationErrors"
-              
+                },
                 "valueType": "NUMERIC",
                 "value": null,
                 "predicate": {
@@ -276,16 +276,16 @@
             "spec": {
               "type": "SIMPLE"
             }
-        
+          },
           "schedule": null,
           "alarmDetails": null,
           "dashboardId": null
-      
+        },
         "propagate": false,
         "propagateRelationTypes": null
       }
     ]
-
+  },
   "provisionDeviceKey": null,
   "firmwareId": null,
   "softwareId": null,
