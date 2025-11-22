@@ -1,0 +1,46 @@
+{
+  "scenarioName": "Unique Test for Conflict Resolution",
+  "description": "Unique scenario to test conflict resolution functionality",
+  "site": {
+    "name": "Unique Test Site 1745",
+    "type": "Site",
+    "address": "123 Test Street",
+    "latitude": 40.7128,
+    "longitude": -74.0060
+  },
+  "buildings": [
+    {
+      "name": "Unique Test Building",
+      "type": "Building",
+      "address": "123 Test Street",
+      "floors": [
+        {
+          "name": "Test Floor",
+          "type": "Floor",
+          "rooms": [
+            {
+              "name": "Test Room Alpha",
+              "type": "Room",
+              "classification": "Server Room",
+              "area_sqm": 50,
+              "gateways": [
+                {
+                  "name": "GW00000099",
+                  "type": "Gateway",
+                  "protocol": "MQTT",
+                  "devices": {
+                    "count": 3,
+                    "prefix": "DW",
+                    "start": 99,
+                    "layout": "grid",
+                    "gridColumns": 2
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

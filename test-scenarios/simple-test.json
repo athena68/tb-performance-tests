@@ -1,0 +1,66 @@
+{
+  "scenarioName": "Simple Test Scenario",
+  "description": "Simple scenario for testing asset provisioning with 2 rooms",
+  "site": {
+    "name": "Test Site",
+    "type": "Site",
+    "address": "123 Test Street",
+    "latitude": 40.7128,
+    "longitude": -74.0060
+  },
+  "buildings": [
+    {
+      "name": "Test Building",
+      "type": "Building",
+      "address": "123 Test Street",
+      "floors": [
+        {
+          "name": "Test Floor",
+          "type": "Floor",
+          "rooms": [
+            {
+              "name": "Test Room 1",
+              "type": "Room",
+              "classification": "Server Room",
+              "area_sqm": 100,
+              "gateways": [
+                {
+                  "name": "GW00000000",
+                  "type": "Gateway",
+                  "protocol": "MQTT",
+                  "devices": {
+                    "count": 5,
+                    "prefix": "DW",
+                    "start": 0,
+                    "layout": "grid",
+                    "gridColumns": 2
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Test Room 2",
+              "type": "Room",
+              "classification": "Office",
+              "area_sqm": 80,
+              "gateways": [
+                {
+                  "name": "GW00000001",
+                  "type": "Gateway",
+                  "protocol": "MQTT",
+                  "devices": {
+                    "count": 3,
+                    "prefix": "DW",
+                    "start": 5,
+                    "layout": "grid",
+                    "gridColumns": 1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

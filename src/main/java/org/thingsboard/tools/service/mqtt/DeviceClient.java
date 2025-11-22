@@ -28,6 +28,19 @@ public class DeviceClient {
 
     private MqttClient mqttClient;
 
+    // Explicit getter methods to avoid Lombok compilation issues
+    public String getGatewayName() {
+        return gatewayName;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public MqttClient getMqttClient() {
+        return mqttClient;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

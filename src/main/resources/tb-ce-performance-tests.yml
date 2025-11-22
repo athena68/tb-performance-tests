@@ -131,8 +131,8 @@ device:
   # Device API to use - MQTT, HTTP or LWM2M
   api: "${DEVICE_API:MQTT}"
   startIdx: "${DEVICE_START_IDX:0}"
-  endIdx: "${DEVICE_END_IDX:1000}"
-  count: "${DEVICE_COUNT:1000}" # count of devices to be used by clients in k8s deployment run
+  endIdx: "${DEVICE_END_IDX:10}"
+  count: "${DEVICE_COUNT:10}" # count of devices to be used by clients in k8s deployment run
   createOnStart: "${DEVICE_CREATE_ON_START:true}"
   deleteOnComplete: "${DEVICE_DELETE_ON_COMPLETE:false}"
 gateway:
@@ -148,11 +148,11 @@ customer:
   createOnStart: "${CUSTOMER_CREATE_ON_START:true}"
   deleteOnComplete: "${CUSTOMER_DELETE_ON_COMPLETE:false}"
 dashboard:
-  createOnStart: "${DASHBOARD_CREATE_ON_START:true}"
+  createOnStart: "${DASHBOARD_CREATE_ON_START:false}"
   deleteOnComplete: "${DASHBOARD_DELETE_ON_COMPLETE:false}"
   deleteIfExists: "${DASHBOARD_DELETE_IF_EXISTS:false}"
-  tenant: alarms.json # please use comma separated list for multiple dashboards: dashboard1.json, dashboard2.json
-  shared: "devices.json"
+  # tenant: alarms.json # please use comma separated list for multiple dashboards: dashboard1.json, dashboard2.json
+  # shared: "devices.json"
 warmup:
   enabled: "${WARMUP_ENABLED:true}"
   packSize: "${WARMUP_PACK_SIZE:100}"

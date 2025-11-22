@@ -16,7 +16,8 @@
 package org.thingsboard.tools.service.gateway;
 
 import io.netty.util.concurrent.Future;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @ConditionalOnProperty(prefix = "device", value = "api", havingValue = "MQTT")
 public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITest {

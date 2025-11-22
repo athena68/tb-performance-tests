@@ -17,7 +17,7 @@ from typing import Dict, List, Optional
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'config'))
 
 # Default credentials file location (matching cleanup script)
-DEFAULT_CREDENTIALS_FILE = '../credentials.json'
+DEFAULT_CREDENTIALS_FILE = 'test-scenarios/credentials.json'
 
 def load_credentials(creds_file: str = None) -> Dict[str, str]:
     """Load credentials from JSON file with user-friendly fallbacks (reused from cleanup script)"""
@@ -147,11 +147,7 @@ class ThingsBoardProvisioner:
             asset_payload = {
                 "name": name,
                 "type": asset_type,
-                "label": label,
-                "assetProfileId": {
-                    "entityType": "ASSET_PROFILE",
-                    "id": "3d60ab70-bf80-11f0-9dac-f14aa7f7559f"
-                }
+                "label": label
             }
 
             # Create asset first (without attributes)
@@ -276,6 +272,10 @@ class ThingsBoardProvisioner:
                 "type": device_type,
                 "label": label
             }
+
+            # Add additionalInfo for gateway devices to make them appear in Gateway tab
+            if device_type.lower() == 'gateway':
+                device_payload["additionalInfo"] = {"gateway": True}
 
             # Add attributes if any
             if attributes:
@@ -790,7 +790,7 @@ def main():
         print(f"  3. Create {DEFAULT_CREDENTIALS_FILE}")
         return 1
 
-    
+
     # Ensure credentials were loaded successfully
     if not all([url, username, password]):
         print("❌ Failed to load credentials properly")

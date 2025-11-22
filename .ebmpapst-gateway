@@ -1,0 +1,64 @@
+# ebmpapst FFU Performance Test - Gateway Mode Configuration
+# Auto-generated from scenario: Hanoi Cleanroom Facility
+# Generated: 2025-11-21 09:33:04
+
+# ThingsBoard Server Configuration
+REST_URL=http://167.172.75.1:8080
+REST_USERNAME=tenant@thingsboard.org
+REST_PASSWORD=tenant
+REST_POOL_SIZE=4
+REST_CONNECT_SERVER=true
+
+# MQTT Broker Configuration
+MQTT_HOST=167.172.75.1
+MQTT_PORT=1883
+
+# SSL Configuration
+MQTT_SSL_ENABLED=false
+MQTT_SSL_KEY_STORE=
+MQTT_SSL_KEY_STORE_PASSWORD=
+
+# *** CRITICAL: Use GATEWAY mode ***
+TEST_API=gateway
+
+# Device API Protocol (MQTT for gateway)
+DEVICE_API=MQTT
+
+# Gateway Configuration
+GATEWAY_START_IDX=0
+GATEWAY_END_IDX=1
+GATEWAY_CREATE_ON_START=false  # Already created by provisioner
+GATEWAY_DELETE_ON_COMPLETE=false
+
+# Device Configuration
+DEVICE_START_IDX=0
+DEVICE_END_IDX=10               # Create 10 devices for testing
+DEVICE_CREATE_ON_START=true     # Create devices for testing scenario
+DEVICE_DELETE_ON_COMPLETE=false
+
+# Test Payload Type
+TEST_PAYLOAD_TYPE=EBMPAPST_FFU
+
+# Test Execution Configuration
+WARMUP_ENABLED=true
+TEST_ENABLED=true
+
+# Message Rate Configuration
+MESSAGES_PER_SECOND=60
+DURATION_IN_SECONDS=86400
+
+# Alarm Configuration
+ALARMS_PER_SECOND=2
+ALARM_STORM_START_SECOND=60
+ALARM_STORM_END_SECOND=240
+
+# Rule Chain Configuration
+UPDATE_ROOT_RULE_CHAIN=false
+REVERT_ROOT_RULE_CHAIN=false
+RULE_CHAIN_NAME=root_rule_chain_ce.json
+
+# Test Execution Mode
+TEST_SEQUENTIAL=false
+
+# Exit Configuration
+EXIT_AFTER_COMPLETE=true

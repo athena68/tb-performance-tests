@@ -1,58 +1,140 @@
-11:13:34.327 [main] INFO  o.t.tools.PerformanceTestApplication - Starting PerformanceTestApplication using Java 17.0.16 with PID 22527 (/home/tuan/ThingsboardSetup/performance-tests/target/classes started by tuan in /home/tuan/ThingsboardSetup/performance-tests)
-11:13:34.329 [main] INFO  o.t.tools.PerformanceTestApplication - No active profile set, falling back to 1 default profile: "default"
-11:13:35.914 [main] INFO  o.t.t.service.shared.AbstractAPITest - Initialized with deviceStartIdx [0], deviceEndIdx [1000]
-11:13:35.951 [main] INFO  o.t.t.service.shared.AbstractAPITest - Initialized with deviceStartIdx [0], deviceEndIdx [1000]
-11:13:35.953 [main] INFO  o.t.t.s.gateway.MqttGatewayAPITest - Initialized with gatewayStartIdx [0], gatewayEndIdx [10]
-11:13:36.224 [main] INFO  o.t.tools.PerformanceTestApplication - Started PerformanceTestApplication in 2.178 seconds (process running for 2.537)
-11:13:36.226 [main] INFO  o.t.tools.PerformanceTestRunner - Running test
-11:13:37.064 [main] INFO  o.t.t.s.d.DeviceProfileManagerImpl - Device profile [EBMPAPST_FFU] already exists
-11:13:37.307 [main] WARN  o.t.t.s.d.DefaultDashboardManager - [alarms.json] Failed to load dashboard
-com.fasterxml.jackson.core.JsonParseException: Unexpected character ('"' (code 34)): was expecting comma to separate Object entries
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 19, column: 13]
-        at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2648)
-        at com.fasterxml.jackson.core.base.ParserMinimalBase._reportUnexpectedChar(ParserMinimalBase.java:685)
-        at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextFieldName(UTF8StreamJsonParser.java:1021)
-        at com.fasterxml.jackson.databind.deser.std.BaseNodeDeserializer._deserializeContainerNoRecursion(JsonNodeDeserializer.java:539)
-        at com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer.deserialize(JsonNodeDeserializer.java:100)
-        at com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer.deserialize(JsonNodeDeserializer.java:25)
-        at com.fasterxml.jackson.databind.deser.DefaultDeserializationContext.readRootValue(DefaultDeserializationContext.java:342)
-        at com.fasterxml.jackson.databind.ObjectMapper._readTreeAndClose(ObjectMapper.java:4947)
-        at com.fasterxml.jackson.databind.ObjectMapper.readTree(ObjectMapper.java:3260)
-        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.loadDashboard(DefaultDashboardManager.java:102)
-        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.createDashboards(DefaultDashboardManager.java:90)
-        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.createDashboards(DefaultDashboardManager.java:62)
-        at org.thingsboard.tools.service.shared.BaseTestExecutor.runTest(BaseTestExecutor.java:82)
-        at org.thingsboard.tools.PerformanceTestRunner.run(PerformanceTestRunner.java:42)
-        at org.springframework.boot.SpringApplication.lambda$callRunner$4(SpringApplication.java:786)
-        at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:82)
-        at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
-        at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:86)
-        at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
-        at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:786)
-        at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
-        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
-        at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
-        at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
-        at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
-        at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
-        at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
-        at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
-        at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
-        at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
-        at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
-        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
-        at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
-        at org.thingsboard.tools.PerformanceTestApplication.main(PerformanceTestApplication.java:33)
-11:13:37.310 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
+14:40:38.258 [main] INFO  o.t.tools.PerformanceTestApplication - Starting PerformanceTestApplication using Java 17.0.16 with PID 841 (/home/tuan/ThingsboardSetup/performance-tests/target/classes started by tuan in /home/tuan/ThingsboardSetup/performance-tests)
+14:40:38.260 [main] INFO  o.t.tools.PerformanceTestApplication - No active profile set, falling back to 1 default profile: "default"
+14:40:39.420 [main] INFO  o.t.t.service.shared.AbstractAPITest - Initialized with deviceStartIdx [0], deviceEndIdx [1000]
+14:40:39.437 [main] INFO  o.t.t.s.gateway.MqttGatewayAPITest - Initialized with gatewayStartIdx [0], gatewayEndIdx [10]
+14:40:39.443 [main] INFO  o.t.t.service.shared.AbstractAPITest - Initialized with deviceStartIdx [0], deviceEndIdx [1000]
+14:40:39.739 [main] INFO  o.t.tools.PerformanceTestApplication - Started PerformanceTestApplication in 1.811 seconds (process running for 2.185)
+14:40:39.743 [main] INFO  o.t.tools.PerformanceTestRunner - Running test
+14:40:39.976 [main] INFO  o.t.t.s.d.DeviceProfileManagerImpl - Device profile [EBMPAPST_FFU] already exists
+14:40:39.978 [main] INFO  o.t.t.service.shared.AbstractAPITest - Creating 1000 devices...
+14:40:39.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 0 devices have been created so far...
+14:40:40.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 59 devices have been created so far...
+14:40:41.985 [pool-3-thread-2] INFO  o.t.t.service.shared.AbstractAPITest - 124 devices have been created so far...
+14:40:42.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 190 devices have been created so far...
+14:40:43.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 256 devices have been created so far...
+14:40:44.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 323 devices have been created so far...
+14:40:45.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 384 devices have been created so far...
+14:40:46.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 446 devices have been created so far...
+14:40:47.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 514 devices have been created so far...
+14:40:48.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 583 devices have been created so far...
+14:40:49.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 653 devices have been created so far...
+14:40:50.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 719 devices have been created so far...
+14:40:51.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 788 devices have been created so far...
+14:40:52.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 854 devices have been created so far...
+14:40:53.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 923 devices have been created so far...
+14:40:54.985 [pool-3-thread-1] INFO  o.t.t.service.shared.AbstractAPITest - 988 devices have been created so far...
+14:40:55.163 [main] INFO  o.t.t.service.shared.AbstractAPITest - 1000 devices have been created successfully!
+14:40:55.163 [main] INFO  o.t.t.service.shared.BaseMqttAPITest - Connecting 10 gateways...
+14:40:55.461 [REST-0-2] ERROR o.t.t.service.shared.BaseMqttAPITest - Error while connect gateway
+java.lang.RuntimeException: Failed to connect to MQTT broker at 167.172.75.1:1883. Result code is: CONNECTION_REFUSED_NOT_AUTHORIZED
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.initClient(BaseMqttAPITest.java:194)
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.lambda$connectDevices$2(BaseMqttAPITest.java:163)
+        at java.base/java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1375)
+        at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+        at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+        at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+        at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+        at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+14:40:55.462 [REST-0-4] ERROR o.t.t.service.shared.BaseMqttAPITest - Error while connect gateway
+java.lang.RuntimeException: Failed to connect to MQTT broker at 167.172.75.1:1883. Result code is: CONNECTION_REFUSED_NOT_AUTHORIZED
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.initClient(BaseMqttAPITest.java:194)
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.lambda$connectDevices$2(BaseMqttAPITest.java:163)
+        at java.base/java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1375)
+        at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+        at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+        at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+        at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+        at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+14:40:55.483 [REST-0-3] ERROR o.t.t.service.shared.BaseMqttAPITest - Error while connect gateway
+java.lang.RuntimeException: Failed to connect to MQTT broker at 167.172.75.1:1883. Result code is: CONNECTION_REFUSED_NOT_AUTHORIZED
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.initClient(BaseMqttAPITest.java:194)
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.lambda$connectDevices$2(BaseMqttAPITest.java:163)
+        at java.base/java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1375)
+        at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+        at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+        at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+        at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+        at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+14:40:55.486 [REST-0-1] ERROR o.t.t.service.shared.BaseMqttAPITest - Error while connect gateway
+java.lang.RuntimeException: Failed to connect to MQTT broker at 167.172.75.1:1883. Result code is: CONNECTION_REFUSED_NOT_AUTHORIZED
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.initClient(BaseMqttAPITest.java:194)
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.lambda$connectDevices$2(BaseMqttAPITest.java:163)
+        at java.base/java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1375)
+        at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+        at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+        at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+        at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+        at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+14:40:55.607 [REST-0-4] ERROR o.t.t.service.shared.BaseMqttAPITest - Error while connect gateway
+java.lang.RuntimeException: Failed to connect to MQTT broker at 167.172.75.1:1883. Result code is: CONNECTION_REFUSED_NOT_AUTHORIZED
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.initClient(BaseMqttAPITest.java:194)
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.lambda$connectDevices$2(BaseMqttAPITest.java:163)
+        at java.base/java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1375)
+        at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+        at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+        at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+        at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+        at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+14:40:55.631 [REST-0-3] ERROR o.t.t.service.shared.BaseMqttAPITest - Error while connect gateway
+java.lang.RuntimeException: Failed to connect to MQTT broker at 167.172.75.1:1883. Result code is: CONNECTION_REFUSED_NOT_AUTHORIZED
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.initClient(BaseMqttAPITest.java:194)
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.lambda$connectDevices$2(BaseMqttAPITest.java:163)
+        at java.base/java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1375)
+        at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+        at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+        at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+        at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+        at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+14:40:55.637 [REST-0-1] ERROR o.t.t.service.shared.BaseMqttAPITest - Error while connect gateway
+java.lang.RuntimeException: Failed to connect to MQTT broker at 167.172.75.1:1883. Result code is: CONNECTION_REFUSED_NOT_AUTHORIZED
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.initClient(BaseMqttAPITest.java:194)
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.lambda$connectDevices$2(BaseMqttAPITest.java:163)
+        at java.base/java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1375)
+        at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+        at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+        at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+        at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+        at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+14:40:55.640 [REST-0-2] ERROR o.t.t.service.shared.BaseMqttAPITest - Error while connect gateway
+java.lang.RuntimeException: Failed to connect to MQTT broker at 167.172.75.1:1883. Result code is: CONNECTION_REFUSED_NOT_AUTHORIZED
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.initClient(BaseMqttAPITest.java:194)
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.lambda$connectDevices$2(BaseMqttAPITest.java:163)
+        at java.base/java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1375)
+        at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+        at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+        at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+        at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+        at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+14:40:55.785 [REST-0-3] ERROR o.t.t.service.shared.BaseMqttAPITest - Error while connect gateway
+java.lang.RuntimeException: Failed to connect to MQTT broker at 167.172.75.1:1883. Result code is: CONNECTION_REFUSED_NOT_AUTHORIZED
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.initClient(BaseMqttAPITest.java:194)
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.lambda$connectDevices$2(BaseMqttAPITest.java:163)
+        at java.base/java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1375)
+        at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+        at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+        at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+        at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+        at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+14:40:55.785 [REST-0-4] ERROR o.t.t.service.shared.BaseMqttAPITest - Error while connect gateway
+java.lang.RuntimeException: Failed to connect to MQTT broker at 167.172.75.1:1883. Result code is: CONNECTION_REFUSED_NOT_AUTHORIZED
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.initClient(BaseMqttAPITest.java:194)
+        at org.thingsboard.tools.service.shared.BaseMqttAPITest.lambda$connectDevices$2(BaseMqttAPITest.java:163)
+        at java.base/java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1375)
+        at java.base/java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:373)
+        at java.base/java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1182)
+        at java.base/java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1655)
+        at java.base/java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1622)
+        at java.base/java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:165)
+14:40:55.785 [main] INFO  o.t.t.service.shared.BaseMqttAPITest - 0 gateways have been connected successfully!
+14:40:55.787 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger -
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-11:13:37.319 [main] ERROR o.s.boot.SpringApplication - Application run failed
-java.lang.RuntimeException: com.fasterxml.jackson.core.JsonParseException: Unexpected character ('"' (code 34)): was expecting comma to separate Object entries
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 19, column: 13]
-        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.loadDashboard(DefaultDashboardManager.java:108)
-        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.createDashboards(DefaultDashboardManager.java:90)
-        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.createDashboards(DefaultDashboardManager.java:62)
-        at org.thingsboard.tools.service.shared.BaseTestExecutor.runTest(BaseTestExecutor.java:82)
+14:40:55.806 [main] ERROR o.s.boot.SpringApplication - Application run failed
+java.lang.ArithmeticException: / by zero
+        at org.thingsboard.tools.service.gateway.MqttGatewayAPITest.mapDevicesToGatewayClientConnections(MqttGatewayAPITest.java:166)
+        at org.thingsboard.tools.service.gateway.MqttGatewayAPITest.connectGateways(MqttGatewayAPITest.java:117)
+        at org.thingsboard.tools.service.GatewayBaseTestExecutor.initEntities(GatewayBaseTestExecutor.java:48)
+        at org.thingsboard.tools.service.shared.BaseTestExecutor.runTest(BaseTestExecutor.java:88)
         at org.thingsboard.tools.PerformanceTestRunner.run(PerformanceTestRunner.java:42)
         at org.springframework.boot.SpringApplication.lambda$callRunner$4(SpringApplication.java:786)
         at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:82)
@@ -74,16 +156,3 @@ java.lang.RuntimeException: com.fasterxml.jackson.core.JsonParseException: Unexp
         at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
         at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
         at org.thingsboard.tools.PerformanceTestApplication.main(PerformanceTestApplication.java:33)
-Caused by: com.fasterxml.jackson.core.JsonParseException: Unexpected character ('"' (code 34)): was expecting comma to separate Object entries
- at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 19, column: 13]
-        at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2648)
-        at com.fasterxml.jackson.core.base.ParserMinimalBase._reportUnexpectedChar(ParserMinimalBase.java:685)
-        at com.fasterxml.jackson.core.json.UTF8StreamJsonParser.nextFieldName(UTF8StreamJsonParser.java:1021)
-        at com.fasterxml.jackson.databind.deser.std.BaseNodeDeserializer._deserializeContainerNoRecursion(JsonNodeDeserializer.java:539)
-        at com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer.deserialize(JsonNodeDeserializer.java:100)
-        at com.fasterxml.jackson.databind.deser.std.JsonNodeDeserializer.deserialize(JsonNodeDeserializer.java:25)
-        at com.fasterxml.jackson.databind.deser.DefaultDeserializationContext.readRootValue(DefaultDeserializationContext.java:342)
-        at com.fasterxml.jackson.databind.ObjectMapper._readTreeAndClose(ObjectMapper.java:4947)
-        at com.fasterxml.jackson.databind.ObjectMapper.readTree(ObjectMapper.java:3260)
-        at org.thingsboard.tools.service.dashboard.DefaultDashboardManager.loadDashboard(DefaultDashboardManager.java:102)
-        ... 24 common frames omitted

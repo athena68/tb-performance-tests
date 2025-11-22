@@ -25,7 +25,7 @@ import org.thingsboard.tools.service.msg.MessageGenerator;
 import org.thingsboard.tools.service.msg.Msg;
 
 @Slf4j
-@Service(value = "randomTelemetryGenerator")
+@Service(value = "legacyTelemetryGenerator")
 @ConditionalOnProperty(prefix = "test", value = "payloadType", havingValue = "EBMPAPST_FFU")
 public class EbmpapstFfuTelemetryGenerator extends BaseMessageGenerator implements MessageGenerator {
 
