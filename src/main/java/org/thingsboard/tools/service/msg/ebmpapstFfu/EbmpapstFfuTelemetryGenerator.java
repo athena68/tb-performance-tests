@@ -18,56 +18,154 @@ package org.thingsboard.tools.service.msg.ebmpapstFfu;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.thingsboard.tools.service.config.ConfigurationLoader;
 import org.thingsboard.tools.service.msg.BaseMessageGenerator;
 import org.thingsboard.tools.service.msg.MessageGenerator;
 import org.thingsboard.tools.service.msg.Msg;
+
+import jakarta.annotation.PostConstruct;
+import java.util.*;
 
 @Slf4j
 @Service(value = "randomTelemetryGenerator")
 @ConditionalOnProperty(prefix = "test", value = "payloadType", havingValue = "EBMPAPST_FFU")
 public class EbmpapstFfuTelemetryGenerator extends BaseMessageGenerator implements MessageGenerator {
 
-    // ebmpapst EC motor specifications
-    static final int MIN_SPEED = 500;                    // Minimum RPM
-    static final int MAX_SPEED = 2000;                   // Maximum RPM for typical FFU
-    static final int RATED_SPEED = 1800;                 // Rated speed
+    @Autowired(required = false)
+    private ConfigurationLoader configLoader;
 
-    // Alarm thresholds based on ebmpapst specifications
-    static final int DIFFERENTIAL_PRESSURE_ALARM = 450;  // High filter pressure (Pa)
-    static final int MOTOR_TEMP_DERATING = 75;           // Temperature derating starts (°C)
-    static final int MOTOR_TEMP_SHUTDOWN = 85;           // Critical shutdown temperature (°C)
+    @Value("${config.useYaml:true}")
+    private boolean useYamlConfig;
 
-    // Electrical specifications for 355mm fan
-    static final double RATED_VOLTAGE = 400.0;           // DC-Link voltage (V)
-    static final double RATED_CURRENT = 4.5;             // DC-Link current at full load (A)
-    static final int RATED_POWER = 1500;                 // Rated power (W)
+    // ebmpapst EC motor specifications - FALLBACK VALUES
+    static int MIN_SPEED = 500;                    // Minimum RPM
+    static int MAX_SPEED = 2000;                   // Maximum RPM for typical FFU
+    static int RATED_SPEED = 1800;                 // Rated speed
 
-    // Airflow calculations (approximation for 355mm fan)
-    static final int MAX_AIRFLOW = 2330;                 // m³/h at rated speed
+    // Alarm thresholds based on ebmpapst specifications - FALLBACK VALUES
+    static int DIFFERENTIAL_PRESSURE_ALARM = 450;  // High filter pressure (Pa)
+    static int MOTOR_TEMP_DERATING = 75;           // Temperature derating starts (°C)
+    static int MOTOR_TEMP_SHUTDOWN = 85;           // Critical shutdown temperature (°C)
 
-    // Device status configuration - simulates real-world scenarios
-    private static final String[] ALARM_DEVICES = {
+    // Electrical specifications for 355mm fan - FALLBACK VALUES
+    static double RATED_VOLTAGE = 400.0;           // DC-Link voltage (V)
+    static double RATED_CURRENT = 4.5;             // DC-Link current at full load (A)
+    static int RATED_POWER = 1500;                 // Rated power (W)
+
+    // Airflow calculations (approximation for 355mm fan) - FALLBACK VALUES
+    static int MAX_AIRFLOW = 2330;                 // m³/h at rated speed
+
+    // Device status configuration - simulates real-world scenarios - FALLBACK VALUES
+    private static String[] ALARM_DEVICES = {
         "DW00000015",  // High differential pressure (filter clogged)
         "DW00000032",  // Motor overheating
         "DW00000047"   // High differential pressure (filter clogged)
     };
 
-    private static final String[] STOPPED_DEVICES = {
+    private static String[] STOPPED_DEVICES = {
         "DW00000008",  // Manually stopped for maintenance
         "DW00000023",  // Stopped - awaiting repair
         "DW00000041"   // Stopped - scheduled maintenance
     };
 
+    // Vibration warning devices - show elevated vibration but not critical
+    private static String[] VIBRATION_WARNING_DEVICES = {
+        "DW00000022",
+        "DW00000038",
+        "DW00000051"
+    };
+
     // OFFLINE DEVICES - These should NOT send telemetry at all!
     // ThingsBoard will automatically set their 'active' attribute to false
     // when no telemetry is received. Do NOT generate telemetry for these devices.
-    public static final String[] OFFLINE_DEVICES = {
+    public static String[] OFFLINE_DEVICES = {
         "DW00000012",  // Communication lost
         "DW00000029",  // Network timeout
         "DW00000056"   // Disconnected
     };
+
+    @PostConstruct
+    public void init() {
+        if (useYamlConfig && configLoader != null) {
+            try {
+                loadConfigurationFromYaml();
+            } catch (Exception e) {
+                log.warn("Failed to load telemetry config from YAML, using hardcoded values: {}", e.getMessage());
+            }
+        } else {
+            log.info("YAML config disabled, using hardcoded telemetry constants");
+        }
+    }
+
+    /**
+     * Load telemetry configuration constants from YAML
+     */
+    private void loadConfigurationFromYaml() {
+        try {
+            Map<String, Object> config = configLoader.loadTelemetryConfig("ebmpapstffu");
+
+            if (config.isEmpty()) {
+                log.warn("No telemetry config found, using hardcoded values");
+                return;
+            }
+
+            // Load data points configuration
+            Map<String, Object> dataPoints = (Map<String, Object>) config.get("data_points");
+            if (dataPoints != null) {
+                // Load RPM configuration
+                Map<String, Object> rpmConfig = (Map<String, Object>) dataPoints.get("RPM");
+                if (rpmConfig != null) {
+                    if (rpmConfig.containsKey("min")) {
+                        MIN_SPEED = ((Number) rpmConfig.get("min")).intValue();
+                    }
+                    if (rpmConfig.containsKey("max")) {
+                        MAX_SPEED = ((Number) rpmConfig.get("max")).intValue();
+                    }
+                    if (rpmConfig.containsKey("default")) {
+                        RATED_SPEED = ((Number) rpmConfig.get("default")).intValue();
+                    }
+                }
+
+                // Load airflow configuration
+                Map<String, Object> airflowConfig = (Map<String, Object>) dataPoints.get("airSpeed");
+                if (airflowConfig != null && airflowConfig.containsKey("default")) {
+                    MAX_AIRFLOW = ((Number) airflowConfig.get("default")).intValue();
+                }
+            }
+
+            // Load special device configurations
+            Map<String, Object> specialDevices = (Map<String, Object>) config.get("special_devices");
+            if (specialDevices != null) {
+                // Load alarm devices
+                Map<String, Object> alarmDevicesConfig = (Map<String, Object>) specialDevices.get("alarm_devices");
+                if (alarmDevicesConfig != null && alarmDevicesConfig.containsKey("devices")) {
+                    List<String> alarmList = (List<String>) alarmDevicesConfig.get("devices");
+                    ALARM_DEVICES = alarmList.toArray(new String[0]);
+                }
+
+                // Load stopped devices
+                Map<String, Object> stoppedDevicesConfig = (Map<String, Object>) specialDevices.get("stopped_devices");
+                if (stoppedDevicesConfig != null && stoppedDevicesConfig.containsKey("devices")) {
+                    List<String> stoppedList = (List<String>) stoppedDevicesConfig.get("devices");
+                    STOPPED_DEVICES = stoppedList.toArray(new String[0]);
+                }
+            }
+
+            log.info("Successfully loaded telemetry configuration from YAML:");
+            log.info("  Speed range: {} - {} RPM (rated: {})", MIN_SPEED, MAX_SPEED, RATED_SPEED);
+            log.info("  Max airflow: {} m³/h", MAX_AIRFLOW);
+            log.info("  Alarm devices: {}", Arrays.toString(ALARM_DEVICES));
+            log.info("  Stopped devices: {}", Arrays.toString(STOPPED_DEVICES));
+
+        } catch (Exception e) {
+            log.error("Failed to load telemetry configuration from YAML", e);
+            throw e;
+        }
+    }
 
     // Get persistent device seed for consistent per-device values
     private int getDeviceSeed(String deviceName) {
@@ -87,6 +185,16 @@ public class EbmpapstFfuTelemetryGenerator extends BaseMessageGenerator implemen
     // Check if device is stopped
     private boolean isStoppedDevice(String deviceName) {
         for (String device : STOPPED_DEVICES) {
+            if (deviceName.equals(device)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Check if device has vibration warning
+    private boolean isVibrationWarningDevice(String deviceName) {
+        for (String device : VIBRATION_WARNING_DEVICES) {
             if (deviceName.equals(device)) {
                 return true;
             }
@@ -119,6 +227,7 @@ public class EbmpapstFfuTelemetryGenerator extends BaseMessageGenerator implemen
             // Determine device status
             boolean isAlarm = isAlarmDevice(deviceName);
             boolean isStopped = isStoppedDevice(deviceName);
+            boolean isVibrationWarning = isVibrationWarningDevice(deviceName);
 
             // Core Motor Parameters
             // Speed Setpoint - PERSISTENT per device (changes rarely, not every message)
@@ -132,13 +241,15 @@ public class EbmpapstFfuTelemetryGenerator extends BaseMessageGenerator implemen
                 actualSpeed = speedSetpoint + random.nextInt(20) - 10;  // ±10 RPM variation for running devices
             }
 
-            values.put("actualSpeed", actualSpeed);
+            // YAML-compliant key: RPM (not actualSpeed)
+            values.put("RPM", actualSpeed);
             values.put("speedSetpoint", speedSetpoint);  // This stays constant for each device
 
             // Calculate airflow based on fan curve (simplified linear approximation)
             double speedRatio = (double) actualSpeed / RATED_SPEED;
             int calculatedAirflow = (int) (MAX_AIRFLOW * speedRatio);
-            values.put("calculatedAirflow", calculatedAirflow);
+            // YAML-compliant key: airSpeed (not calculatedAirflow)
+            values.put("airSpeed", calculatedAirflow);
 
             // DC-Link Voltage - relatively stable around rated voltage
             double dcLinkVoltage = RATED_VOLTAGE + (random.nextDouble() * 20 - 10);  // ±10V variation
@@ -151,7 +262,8 @@ public class EbmpapstFfuTelemetryGenerator extends BaseMessageGenerator implemen
 
             // Power Consumption - P = V * I * efficiency
             int powerConsumption = (int) (dcLinkVoltage * dcLinkCurrent * 0.9);  // 90% efficiency
-            values.put("powerConsumption", powerConsumption);
+            // YAML-compliant key: energy_consumption (not powerConsumption)
+            values.put("energy_consumption", powerConsumption);
 
             // Ambient Temperature - PERSISTENT per device (room-specific)
             int ambientTemp = 22 + (deviceSeed % 8);  // Each device has persistent ambient (22-30°C)
@@ -237,9 +349,52 @@ public class EbmpapstFfuTelemetryGenerator extends BaseMessageGenerator implemen
                 }
             }
 
-            values.put("operatingStatus", operatingStatus);
-            values.put("alarmCode", alarmCode);
-            values.put("warningCode", warningCode);
+            // YAML-compliant keys: operating_status, error_code, warning_code
+            values.put("operating_status", operatingStatus);
+            values.put("error_code", alarmCode);
+            values.put("warning_code", warningCode);
+
+            // Vibration telemetry (ISO 10816 standard for industrial fans)
+            double vibration5thHarmonic;
+            double vibrationRMS;
+
+            if (isStopped) {
+                // Stopped devices: no vibration
+                vibration5thHarmonic = 0.0;
+                vibrationRMS = 0.0;
+            } else if (isAlarm) {
+                // Alarm devices: high vibration (critical levels)
+                vibration5thHarmonic = 6.0 + random.nextDouble() * 1.5;  // 6.0-7.5 mm/s (near critical)
+                vibrationRMS = 7.5 + random.nextDouble() * 3.0;          // 7.5-10.5 mm/s (above alarm threshold)
+            } else if (isVibrationWarning) {
+                // Vibration warning devices: elevated but not critical
+                vibration5thHarmonic = 3.8 + random.nextDouble() * 0.8;  // 3.8-4.6 mm/s (near alarm threshold)
+                vibrationRMS = 6.2 + random.nextDouble() * 1.2;          // 6.2-7.4 mm/s (near alarm threshold)
+                if (warningCode == 0) {
+                    warningCode = 402;  // High vibration warning
+                }
+            } else {
+                // Normal devices: vibration correlates with RPM and load factor
+                // Base vibration increases with speed
+                double speedFactor = speedRatio;  // 0.0 to 1.0
+                double vibrationLoadFactor = loadFactor;  // 0.7 to 1.0
+
+                // 5th harmonic vibration: indicates blade/fan balance issues
+                // Normal range: 0.1-3.0 mm/s, increases with speed
+                double base5thHarmonic = 0.8 + (speedFactor * 1.5);  // 0.8-2.3 mm/s base
+                vibration5thHarmonic = base5thHarmonic * vibrationLoadFactor + (random.nextDouble() * 0.3 - 0.15);
+                vibration5thHarmonic = Math.max(0.1, Math.min(3.5, vibration5thHarmonic));  // Clamp 0.1-3.5 mm/s
+
+                // RMS vibration: overall condition indicator
+                // Normal range: 0.5-5.0 mm/s, increases with speed and load
+                double baseRMS = 1.5 + (speedFactor * 2.0);  // 1.5-3.5 mm/s base
+                vibrationRMS = baseRMS * vibrationLoadFactor + (random.nextDouble() * 0.5 - 0.25);
+                vibrationRMS = Math.max(0.5, Math.min(5.5, vibrationRMS));  // Clamp 0.5-5.5 mm/s
+            }
+
+            // Round to 2 decimal places and add to telemetry
+            values.put("Vibration_5th_harmonic_sum", Math.round(vibration5thHarmonic * 100.0) / 100.0);
+            values.put("Vibration_RMS_sum", Math.round(vibrationRMS * 100.0) / 100.0);
 
             // Additional ebmpapst-specific parameters
             values.put("speedActualPercent", (int)((actualSpeed * 100.0) / RATED_SPEED));

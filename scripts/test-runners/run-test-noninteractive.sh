@@ -4,7 +4,9 @@
 #
 
 # Load environment variables
-export $(cat .env.ebmpapst-gateway | grep -v '^#' | sed 's/#.*$//' | sed 's/[[:space:]]*$//' | grep -v '^$' | xargs)
+export $(cat .env | grep -v '^#' | sed 's/#.*$//' | sed 's/[[:space:]]*$//' | grep -v '^$' | xargs)
+
+#mvn clean compile && mvn spring-boot:run
 
 # Run Maven
 mvn spring-boot:run

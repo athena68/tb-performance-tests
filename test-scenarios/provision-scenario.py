@@ -835,7 +835,7 @@ class ThingsBoardProvisioner:
 
         # Read test configuration from scenario
         test_config = self.scenario.get('testConfig', {})
-        payload_type = test_config.get('payloadType', 'default')
+        payload_type = test_config.get('payloadType', 'EBMPAPST_FFU')
         messages_per_second = test_config.get('messagesPerSecond', 60)
         duration_in_seconds = test_config.get('durationInSeconds', 86400)
 

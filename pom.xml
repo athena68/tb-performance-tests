@@ -831,6 +831,11 @@
             <version>3.0.2</version>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.17.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.thingsboard.common</groupId>
             <artifactId>data</artifactId>
             <version>${thingsboard.version}</version>

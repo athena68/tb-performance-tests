@@ -283,6 +283,470 @@
         },
         "propagate": false,
         "propagateRelationTypes": null
+      },
+      {
+        "id": "ebmpapst-error-code",
+        "alarmType": "FFU Error Code",
+        "createRules": {
+          "CRITICAL": {
+            "condition": {
+              "condition": [
+                {
+                  "key": {
+                    "type": "TIME_SERIES",
+                    "key": "error_code"
+                  },
+                  "valueType": "NUMERIC",
+                  "value": null,
+                  "predicate": {
+                    "type": "NUMERIC",
+                    "operation": "GREATER",
+                    "value": {
+                      "defaultValue": 0,
+                      "userValue": null,
+                      "dynamicValue": null
+                    }
+                  }
+                }
+              ],
+              "spec": {
+                "type": "SIMPLE"
+              }
+            },
+            "schedule": null,
+            "alarmDetails": "FFU error detected - check error_code: 101=Motor Overheating, 102=Motor Failure, 201=High Pressure, 202=Filter Blocked, 301=Sensor Failure",
+            "dashboardId": null
+          }
+        },
+        "clearRule": {
+          "condition": {
+            "condition": [
+              {
+                "key": {
+                  "type": "TIME_SERIES",
+                  "key": "error_code"
+                },
+                "valueType": "NUMERIC",
+                "value": null,
+                "predicate": {
+                  "type": "NUMERIC",
+                  "operation": "EQUAL",
+                  "value": {
+                    "defaultValue": 0,
+                    "userValue": null,
+                    "dynamicValue": null
+                  }
+                }
+              }
+            ],
+            "spec": {
+              "type": "SIMPLE"
+            }
+          },
+          "schedule": null,
+          "alarmDetails": "Error cleared",
+          "dashboardId": null
+        },
+        "propagate": true,
+        "propagateRelationTypes": ["Contains"]
+      },
+      {
+        "id": "ebmpapst-warning-code",
+        "alarmType": "FFU Warning Code",
+        "createRules": {
+          "WARNING": {
+            "condition": {
+              "condition": [
+                {
+                  "key": {
+                    "type": "TIME_SERIES",
+                    "key": "warning_code"
+                  },
+                  "valueType": "NUMERIC",
+                  "value": null,
+                  "predicate": {
+                    "type": "NUMERIC",
+                    "operation": "GREATER",
+                    "value": {
+                      "defaultValue": 0,
+                      "userValue": null,
+                      "dynamicValue": null
+                    }
+                  }
+                }
+              ],
+              "spec": {
+                "type": "SIMPLE"
+              }
+            },
+            "schedule": null,
+            "alarmDetails": "FFU warning detected - check warning_code: 301=High Temp Warning, 302=Filter Change Due, 303=Low Efficiency, 401=Comm Warning, 402=High Vibration",
+            "dashboardId": null
+          }
+        },
+        "clearRule": {
+          "condition": {
+            "condition": [
+              {
+                "key": {
+                  "type": "TIME_SERIES",
+                  "key": "warning_code"
+                },
+                "valueType": "NUMERIC",
+                "value": null,
+                "predicate": {
+                  "type": "NUMERIC",
+                  "operation": "EQUAL",
+                  "value": {
+                    "defaultValue": 0,
+                    "userValue": null,
+                    "dynamicValue": null
+                  }
+                }
+              }
+            ],
+            "spec": {
+              "type": "SIMPLE"
+            }
+          },
+          "schedule": null,
+          "alarmDetails": "Warning cleared",
+          "dashboardId": null
+        },
+        "propagate": true,
+        "propagateRelationTypes": ["Contains"]
+      },
+      {
+        "id": "ebmpapst-operating-status-alarm",
+        "alarmType": "FFU Operating Status Alarm",
+        "createRules": {
+          "CRITICAL": {
+            "condition": {
+              "condition": [
+                {
+                  "key": {
+                    "type": "TIME_SERIES",
+                    "key": "operating_status"
+                  },
+                  "valueType": "STRING",
+                  "value": null,
+                  "predicate": {
+                    "type": "STRING",
+                    "operation": "NOT_EQUAL",
+                    "value": {
+                      "defaultValue": "RUNNING",
+                      "userValue": null,
+                      "dynamicValue": null
+                    },
+                    "ignoreCase": false
+                  }
+                }
+              ],
+              "spec": {
+                "type": "SIMPLE"
+              }
+            },
+            "schedule": null,
+            "alarmDetails": "FFU operating status is not RUNNING - check status: ALARM/FAULT/STOPPED",
+            "dashboardId": null
+          }
+        },
+        "clearRule": {
+          "condition": {
+            "condition": [
+              {
+                "key": {
+                  "type": "TIME_SERIES",
+                  "key": "operating_status"
+                },
+                "valueType": "STRING",
+                "value": null,
+                "predicate": {
+                  "type": "STRING",
+                  "operation": "EQUAL",
+                  "value": {
+                    "defaultValue": "RUNNING",
+                    "userValue": null,
+                    "dynamicValue": null
+                  },
+                  "ignoreCase": false
+                }
+              }
+            ],
+            "spec": {
+              "type": "SIMPLE"
+            }
+          },
+          "schedule": null,
+          "alarmDetails": "FFU returned to normal operation",
+          "dashboardId": null
+        },
+        "propagate": true,
+        "propagateRelationTypes": ["Contains"]
+      },
+      {
+        "id": "ebmpapst-vibration-5th-harmonic-warning",
+        "alarmType": "Vibration 5th Harmonic Warning",
+        "createRules": {
+          "WARNING": {
+            "condition": {
+              "condition": [
+                {
+                  "key": {
+                    "type": "TIME_SERIES",
+                    "key": "Vibration_5th_harmonic_sum"
+                  },
+                  "valueType": "NUMERIC",
+                  "value": null,
+                  "predicate": {
+                    "type": "NUMERIC",
+                    "operation": "GREATER_OR_EQUAL",
+                    "value": {
+                      "defaultValue": 4.5,
+                      "userValue": null,
+                      "dynamicValue": null
+                    }
+                  }
+                }
+              ],
+              "spec": {
+                "type": "SIMPLE"
+              }
+            },
+            "schedule": null,
+            "alarmDetails": "5th harmonic vibration elevated - possible blade/fan balance issue",
+            "dashboardId": null
+          }
+        },
+        "clearRule": {
+          "condition": {
+            "condition": [
+              {
+                "key": {
+                  "type": "TIME_SERIES",
+                  "key": "Vibration_5th_harmonic_sum"
+                },
+                "valueType": "NUMERIC",
+                "value": null,
+                "predicate": {
+                  "type": "NUMERIC",
+                  "operation": "LESS",
+                  "value": {
+                    "defaultValue": 3.5,
+                    "userValue": null,
+                    "dynamicValue": null
+                  }
+                }
+              }
+            ],
+            "spec": {
+              "type": "SIMPLE"
+            }
+          },
+          "schedule": null,
+          "alarmDetails": "Vibration returned to normal",
+          "dashboardId": null
+        },
+        "propagate": true,
+        "propagateRelationTypes": ["Contains"]
+      },
+      {
+        "id": "ebmpapst-vibration-5th-harmonic-critical",
+        "alarmType": "Vibration 5th Harmonic Critical",
+        "createRules": {
+          "CRITICAL": {
+            "condition": {
+              "condition": [
+                {
+                  "key": {
+                    "type": "TIME_SERIES",
+                    "key": "Vibration_5th_harmonic_sum"
+                  },
+                  "valueType": "NUMERIC",
+                  "value": null,
+                  "predicate": {
+                    "type": "NUMERIC",
+                    "operation": "GREATER_OR_EQUAL",
+                    "value": {
+                      "defaultValue": 7.0,
+                      "userValue": null,
+                      "dynamicValue": null
+                    }
+                  }
+                }
+              ],
+              "spec": {
+                "type": "SIMPLE"
+              }
+            },
+            "schedule": null,
+            "alarmDetails": "5th harmonic vibration critical - immediate shutdown recommended",
+            "dashboardId": null
+          }
+        },
+        "clearRule": {
+          "condition": {
+            "condition": [
+              {
+                "key": {
+                  "type": "TIME_SERIES",
+                  "key": "Vibration_5th_harmonic_sum"
+                },
+                "valueType": "NUMERIC",
+                "value": null,
+                "predicate": {
+                  "type": "NUMERIC",
+                  "operation": "LESS",
+                  "value": {
+                    "defaultValue": 5.5,
+                    "userValue": null,
+                    "dynamicValue": null
+                  }
+                }
+              }
+            ],
+            "spec": {
+              "type": "SIMPLE"
+            }
+          },
+          "schedule": null,
+          "alarmDetails": "Critical vibration cleared",
+          "dashboardId": null
+        },
+        "propagate": true,
+        "propagateRelationTypes": ["Contains"]
+      },
+      {
+        "id": "ebmpapst-vibration-rms-warning",
+        "alarmType": "Vibration RMS Warning",
+        "createRules": {
+          "WARNING": {
+            "condition": {
+              "condition": [
+                {
+                  "key": {
+                    "type": "TIME_SERIES",
+                    "key": "Vibration_RMS_sum"
+                  },
+                  "valueType": "NUMERIC",
+                  "value": null,
+                  "predicate": {
+                    "type": "NUMERIC",
+                    "operation": "GREATER_OR_EQUAL",
+                    "value": {
+                      "defaultValue": 7.1,
+                      "userValue": null,
+                      "dynamicValue": null
+                    }
+                  }
+                }
+              ],
+              "spec": {
+                "type": "SIMPLE"
+              }
+            },
+            "schedule": null,
+            "alarmDetails": "RMS vibration elevated - overall condition monitoring warning",
+            "dashboardId": null
+          }
+        },
+        "clearRule": {
+          "condition": {
+            "condition": [
+              {
+                "key": {
+                  "type": "TIME_SERIES",
+                  "key": "Vibration_RMS_sum"
+                },
+                "valueType": "NUMERIC",
+                "value": null,
+                "predicate": {
+                  "type": "NUMERIC",
+                  "operation": "LESS",
+                  "value": {
+                    "defaultValue": 5.5,
+                    "userValue": null,
+                    "dynamicValue": null
+                  }
+                }
+              }
+            ],
+            "spec": {
+              "type": "SIMPLE"
+            }
+          },
+          "schedule": null,
+          "alarmDetails": "Vibration returned to normal",
+          "dashboardId": null
+        },
+        "propagate": true,
+        "propagateRelationTypes": ["Contains"]
+      },
+      {
+        "id": "ebmpapst-vibration-rms-critical",
+        "alarmType": "Vibration RMS Critical",
+        "createRules": {
+          "CRITICAL": {
+            "condition": {
+              "condition": [
+                {
+                  "key": {
+                    "type": "TIME_SERIES",
+                    "key": "Vibration_RMS_sum"
+                  },
+                  "valueType": "NUMERIC",
+                  "value": null,
+                  "predicate": {
+                    "type": "NUMERIC",
+                    "operation": "GREATER_OR_EQUAL",
+                    "value": {
+                      "defaultValue": 11.0,
+                      "userValue": null,
+                      "dynamicValue": null
+                    }
+                  }
+                }
+              ],
+              "spec": {
+                "type": "SIMPLE"
+              }
+            },
+            "schedule": null,
+            "alarmDetails": "RMS vibration critical - immediate shutdown recommended",
+            "dashboardId": null
+          }
+        },
+        "clearRule": {
+          "condition": {
+            "condition": [
+              {
+                "key": {
+                  "type": "TIME_SERIES",
+                  "key": "Vibration_RMS_sum"
+                },
+                "valueType": "NUMERIC",
+                "value": null,
+                "predicate": {
+                  "type": "NUMERIC",
+                  "operation": "LESS",
+                  "value": {
+                    "defaultValue": 8.5,
+                    "userValue": null,
+                    "dynamicValue": null
+                  }
+                }
+              }
+            ],
+            "spec": {
+              "type": "SIMPLE"
+            }
+          },
+          "schedule": null,
+          "alarmDetails": "Critical vibration cleared",
+          "dashboardId": null
+        },
+        "propagate": true,
+        "propagateRelationTypes": ["Contains"]
       }
     ]
   },

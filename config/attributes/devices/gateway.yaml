@@ -1,8 +1,52 @@
 # Gateway Device Attributes Configuration
-# Only client attributes provided by gateway device
+# Simplified configuration for performance testing
 
-# Client Attributes (provided by gateway device)
-client_attributes:
-  firmware_version: null    # Will be provided by gateway device
-  serial_number: null       # Will be provided by gateway device
-  mac_address: null         # Will be provided by gateway device
+# Device Information
+device_info:
+  manufacturer: "ThingsBoard"
+  gw_model:
+    - "TB-GW-100"
+    - "TB-GW-200"
+    - "TB-GW-300"
+
+  firmware_version:
+    format: "GW-{{version}}.{{patch}}"
+    version:
+      min: 2
+      max: 3
+    patch:
+      min: 0
+      max: 9
+
+  serial_number:
+    format: "GW-{{random:1000:9999}}-{{random:100000:999999}}"
+
+  # MAC address for network connectivity
+  mac_address:
+    format: "{{macPrefix}}:{{random:10:FF}}:{{random:10:FF}}:{{random:10:FF}}"
+    macPrefix: "DC:A6:32"  # ThingsBoard OUI prefix
+
+# Network Configuration
+network:
+  ip_address:
+    format: "192.168.1.{{random:100:200}}"
+  protocol: "MQTT"
+  port: 1883
+
+# Communication
+communication:
+  max_devices: 100
+  supported_device_types:
+    - "ebmpapst_ffu"
+    - "smart_meter"
+    - "smart_tracker"
+
+# Installation Data
+installation:
+  installation_date:
+    type: "random_within_last_n_days"
+    days: 365  # Within last year
+
+  commissioning_date:
+    type: "relative_to_installation"
+    offset_days: 1  # 1 day after install

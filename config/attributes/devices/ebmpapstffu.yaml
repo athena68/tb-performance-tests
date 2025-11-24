@@ -1,8 +1,92 @@
 # ebmpapst FFU Device Attributes Configuration
-# Only client attributes provided by BLE device
+# Simplified configuration for performance testing
 
-# Client Attributes (provided by BLE device)
-client_attributes:
-  firmware_version: null    # Will be provided by BLE device
-  serial_number: null       # Will be provided by BLE device
-  mac_address: null         # Will be provided by BLE device
+# Device Information
+device_info:
+  manufacturer: "ebm-papst"
+  fan_model:
+    - "R3G355-AS03-01"  # RadiPac 355mm
+    - "R3G310-AP09-01"  # RadiPac 310mm
+    - "R3G400-AP30-01"  # RadiPac 400mm
+    - "R2E250-AE52-05"  # RadiCal 250mm
+    - "R2E220-AA06-17"  # RadiCal 220mm
+
+  firmware_version:
+    format: "ACE-{{version}}.{{patch}}"  # ACE-3.x or ACE-4.x
+    version:
+      min: 3
+      max: 4
+    patch:
+      min: 0
+      max: 9
+
+  serial_number:
+    format: "EBM-{{random:1000:9999}}-{{random:100000:999999}}"
+
+  # MAC address for BLE connectivity
+  mac_address:
+    format: "{{macPrefix}}:{{random:10:FF}}:{{random:10:FF}}:{{random:10:FF}}"
+    macPrefix: "E8:4F:25"  # ebm-papst OUI prefix
+
+# Physical Position (Grid Layout)
+# Grid configuration: 6 columns x 5 rows
+# Starting position: (0.4, 0.4)
+# Spacing: 0.05 between devices
+position:
+  layout: "grid"
+  grid_columns: 6
+  grid_rows: 5
+  start_x: 0.4
+  start_y: 0.4
+  spacing_x: 0.05
+  spacing_y: 0.05
+  # xPos and yPos will be calculated as:
+  # col = deviceIndex % 6
+  # row = deviceIndex / 6
+  # xPos = 0.4 + col * 0.05
+  # yPos = 0.4 + row * 0.05
+
+# Physical Specifications (Essential only)
+physical_specs:
+  fan_diameter:
+    # Extracted from model name (R3G355 -> 355mm)
+    source: "fan_model"
+
+  rated_speed: 1800  # RPM
+  max_speed: 2000    # RPM
+  min_speed: 500     # RPM
+
+# Motor Specifications (Essential only)
+motor_specs:
+  rated_airflow: 2330  # m³/h at rated speed
+  rated_power: 1500    # W (maximum rated power)
+  rated_voltage: 400   # V DC-Link
+  rated_current: 4.5   # A
+
+# Filter Specifications
+filter_specs:
+  filter_type:
+    - "HEPA H13"
+    - "HEPA H14"
+    - "ULPA U15"
+    - "ULPA U16"
+
+  filter_change_interval: 8760  # Hours (1 year typical)
+
+# Communication Configuration (Essential only)
+communication:
+  modbus_address:
+    min: 1
+    max: 247  # MODBUS address range
+  modbus_protocol: "RTU"
+  communication_interface: "RS485 MODBUS-RTU"
+
+# Installation Data (Essential only)
+installation:
+  installation_date:
+    type: "random_within_last_n_days"
+    days: 730  # Within last 2 years
+
+  commissioning_date:
+    type: "relative_to_installation"
+    offset_days: 7  # 1 week after install
