@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-spring.main.web-application-type: NONE
+# spring.main.web-application-type: NONE
 server:
   # Server bind address
   address: "0.0.0.0"
@@ -23,15 +23,11 @@ server:
 
 management:
   endpoints:
-    web:
-      exposure:
-        include: "${ENDPOINTS_WEB_EXPOSURE_INCLUDE:*}"
-  endpoint:
-    shutdown:
-      enabled: "${ENDPOINT_SHUTDOWN_ENABLED:true}"
-endpoints:
-  shutdown:
-    enabled: "${ENDPOINTS_SHUTDOWN_ENABLED:true}"
+    enabled: false
+  health:
+    enabled: false
+  info:
+    enabled: false
 
 rest:
   connect_server: "${REST_CONNECT_SERVER:true}"

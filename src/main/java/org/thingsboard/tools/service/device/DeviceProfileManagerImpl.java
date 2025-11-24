@@ -80,6 +80,10 @@ public class DeviceProfileManagerImpl implements DeviceProfileManager {
 
         for (String file : files) {
             DeviceProfile deviceProfile = loadDeviceProfile(file);
+            if (deviceProfile == null) {
+                // Skip invalid device profiles - already logged in loadDeviceProfile()
+                continue;
+            }
             String name = deviceProfile.getName();
             if (existedDeviceProfileMap.containsKey(name)) {
                 log.info("Device profile [{}] already exists", name);
@@ -94,6 +98,12 @@ public class DeviceProfileManagerImpl implements DeviceProfileManager {
                     throw new RuntimeException("Device profile " + name + " not found, but create on start is not allowed");
                 }
             }
+        }
+
+        // Load Gateway profile from ThingsBoard if it exists (for gateway entities)
+        if (!deviceProfiles.containsKey("Gateway") && existedDeviceProfileMap.containsKey("Gateway")) {
+            log.info("Loading Gateway profile from ThingsBoard...");
+            deviceProfiles.put("Gateway", existedDeviceProfileMap.get("Gateway"));
         }
 
     }
@@ -124,7 +134,7 @@ public class DeviceProfileManagerImpl implements DeviceProfileManager {
             return mapper.readValue(content, DeviceProfile.class);
         } catch (Exception e) {
             log.error("[{}] Failed to load device profile", filename, e);
-            throw new RuntimeException(e);
+            return null;  // Return null to skip invalid profiles instead of crashing the app
         }
     }
 

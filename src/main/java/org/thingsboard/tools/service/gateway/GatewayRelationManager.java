@@ -30,14 +30,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Manager for creating "Created" relations between gateways and devices.
- * Required for gateway dashboards to display device information.
+ * Manager for creating "Created" and "Contains" relations between gateways and devices.
+ * Required for gateway dashboards to display device information and proper hierarchy.
  */
 @Slf4j
 @Service
 public class GatewayRelationManager {
 
     private static final String CREATED_RELATION_TYPE = "Created";
+    private static final String CONTAINS_RELATION_TYPE = "Contains";
 
     private final RestClientService restClientService;
 
@@ -71,28 +72,28 @@ public class GatewayRelationManager {
 
         for (Device device : devices) {
             try {
-                // Create bidirectional "Created" relations
+                // Create bidirectional "Created" relations for dashboard functionality
                 // 1. Gateway -> Device (From gateway perspective)
-                EntityRelation gatewayToDevice = new EntityRelation();
-                gatewayToDevice.setFrom(gateway.getId());
-                gatewayToDevice.setTo(device.getId());
-                gatewayToDevice.setType(CREATED_RELATION_TYPE);
-                gatewayToDevice.setTypeGroup(RelationTypeGroup.COMMON);
+                EntityRelation gatewayToDeviceCreated = new EntityRelation();
+                gatewayToDeviceCreated.setFrom(gateway.getId());
+                gatewayToDeviceCreated.setTo(device.getId());
+                gatewayToDeviceCreated.setType(CREATED_RELATION_TYPE);
+                gatewayToDeviceCreated.setTypeGroup(RelationTypeGroup.COMMON);
 
-                restClient.saveRelation(gatewayToDevice);
+                restClient.saveRelation(gatewayToDeviceCreated);
                 successCount.incrementAndGet();
 
                 // 2. Device -> Gateway (From device perspective, shows as "To" gateway)
-                EntityRelation deviceToGateway = new EntityRelation();
-                deviceToGateway.setFrom(device.getId());
-                deviceToGateway.setTo(gateway.getId());
-                deviceToGateway.setType(CREATED_RELATION_TYPE);
-                deviceToGateway.setTypeGroup(RelationTypeGroup.COMMON);
+                EntityRelation deviceToGatewayCreated = new EntityRelation();
+                deviceToGatewayCreated.setFrom(device.getId());
+                deviceToGatewayCreated.setTo(gateway.getId());
+                deviceToGatewayCreated.setType(CREATED_RELATION_TYPE);
+                deviceToGatewayCreated.setTypeGroup(RelationTypeGroup.COMMON);
 
-                restClient.saveRelation(deviceToGateway);
+                restClient.saveRelation(deviceToGatewayCreated);
                 successCount.incrementAndGet();
 
-                log.debug("Created '{}' relations: {} <-> {}",
+                log.debug("Created bidirectional {} relations for {} <-> {}",
                         CREATED_RELATION_TYPE, gateway.getName(), device.getName());
 
             } catch (Exception e) {
@@ -103,8 +104,8 @@ public class GatewayRelationManager {
         }
 
         int totalRelations = successCount.get();
-        log.info("✓ Created {} '{}' relations for gateway {} ({} devices, {} relations each direction)",
-                totalRelations, CREATED_RELATION_TYPE, gateway.getName(), devices.size(), totalRelations / 2);
+        log.info("✓ Created {} total relations for gateway {} ({} devices: {} bidirectional '{}')",
+                totalRelations, gateway.getName(), devices.size(), devices.size() * 2, CREATED_RELATION_TYPE);
 
         if (failCount.get() > 0) {
             log.warn("Failed to create {} relations", failCount.get());

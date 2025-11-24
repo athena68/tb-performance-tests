@@ -1,10 +1,13 @@
-# ebmpapst FFU Performance Tests
+# ThingsBoard Performance Tests
 
-> **📖 Documentation:** [docs/](docs/) - Complete guides for gateway provisioning, FFU testing, and dashboards
-> 
-> **📊 Status:** [STATUS.md](STATUS.md) - Current project status and quick commands
->
-> **🚀 Quick Start:** [docs/GATEWAY_PROVISIONING.md](docs/GATEWAY_PROVISIONING.md)
+## Documentation
+
+📚 **Comprehensive Documentation** - See [docs/](docs/) directory:
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Architecture decisions, design patterns, and project structure
+- **[CHANGELOG.md](docs/CHANGELOG.md)** - Implementation history, version changes, and migration notes
+- **[MAINTENANCE.md](docs/MAINTENANCE.md)** - Maintenance procedures, troubleshooting, and cleanup guides
+- **[TOOLS.md](docs/TOOLS.md)** - Development tools, utilities, scripts, and testing aids
+- **[CLAUDE.md](CLAUDE.md)** - Claude Code instructions for AI-assisted development
 
 ---
 

@@ -228,7 +228,7 @@ public abstract class AbstractAPITest {
         } else {
             result = Collections.synchronizedList(new ArrayList<>(1024 * 1024));
         }
-        int entityCount = endIdx - startIdx;
+        int entityCount = endIdx - startIdx + 1;
 
 
         List<CustomerId> customerIds = customerManager.getCustomerIds();
@@ -236,12 +236,14 @@ public abstract class AbstractAPITest {
         log.info("Creating {} {}...", entityCount, (isGateway ? "gateways" : "devices"));
         CountDownLatch latch = new CountDownLatch(entityCount);
         AtomicInteger count = new AtomicInteger();
-        for (int i = startIdx; i < endIdx; i++) {
+        for (int i = startIdx; i <= endIdx; i++) {
             final int tokenNumber = i;
             restClientService.getHttpExecutor().submit(() -> {
                 Device entity = new Device();
                 try {
-                    entity.setDeviceProfileId(deviceProfileManager.getByName(payloadType).getId());
+                    // Gateways use "Gateway" profile, devices use payload type profile (e.g., EBMPAPST_FFU)
+                    String profileName = isGateway ? "Gateway" : payloadType;
+                    entity.setDeviceProfileId(deviceProfileManager.getByName(profileName).getId());
                     String token = getToken(isGateway, tokenNumber);
                     if (isGateway) {
                         entity.setName(token);

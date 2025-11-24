@@ -11,17 +11,17 @@ echo "ebmpapst FFU Gateway Mode Test"
 echo "=========================================="
 echo ""
 
-# Check if .env.ebmpapst-gateway exists
-if [ ! -f .env.ebmpapst-gateway ]; then
-    echo "ERROR: .env.ebmpapst-gateway not found!"
+# Check if .env exists
+if [ ! -f .env]; then
+    echo "ERROR: .env not found!"
     echo ""
-    echo "Please create .env.ebmpapst-gateway or copy from .env.ebmpapst"
+    echo "Please create .env"
     exit 1
 fi
 
 # Load environment variables
-echo "Loading configuration from .env.ebmpapst-gateway..."
-export $(cat .env.ebmpapst-gateway | grep -v '^#' | sed 's/#.*$//' | sed 's/[[:space:]]*$//' | grep -v '^$' | xargs)
+echo "Loading configuration from .env..."
+export $(cat .env | grep -v '^#' | sed 's/#.*$//' | sed 's/[[:space:]]*$//' | grep -v '^$' | xargs)
 echo "Configuration loaded!"
 echo ""
 

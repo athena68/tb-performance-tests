@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.thingsboard.tools.service.customer.CustomerManager;
 import org.thingsboard.tools.service.dashboard.DefaultDashboardManager;
 import org.thingsboard.tools.service.device.DeviceProfileManager;
-import org.thingsboard.tools.service.discovery.AssetDiscoveryService;
 import org.thingsboard.tools.service.rule.RuleChainManager;
 
 import jakarta.annotation.PostConstruct;
@@ -70,9 +69,7 @@ public abstract class BaseTestExecutor implements TestExecutor {
     @Autowired
     private DeviceProfileManager deviceProfileManager;
 
-    @Autowired
-    private AssetDiscoveryService assetDiscoveryService;
-
+  
     @PostConstruct
     public void init() throws Exception {
 
@@ -80,8 +77,8 @@ public abstract class BaseTestExecutor implements TestExecutor {
 
     @Override
     public void runTest() throws Exception {
-        // Detect and log asset hierarchy
-        detectAndLogHierarchy();
+        // Asset hierarchy detection disabled (config folder approach removed)
+        // detectAndLogHierarchy();
 
         deviceProfileManager.createDeviceProfiles();
 
@@ -127,42 +124,4 @@ public abstract class BaseTestExecutor implements TestExecutor {
 
     protected abstract void waitOtherClients() throws Exception;
 
-    /**
-     * Detect and log asset hierarchy information
-     */
-    protected void detectAndLogHierarchy() {
-        try {
-            log.info("🔍 Analyzing ThingsBoard ecosystem for asset hierarchy...");
-
-            AssetDiscoveryService.HierarchyInfo hierarchy = assetDiscoveryService.detectHierarchy();
-
-            if (hierarchy.isHasHierarchicalAssets()) {
-                log.info("🏗️  Hierarchical assets detected!");
-                log.info("   📊 Summary: {}", assetDiscoveryService.getHierarchySummary());
-
-                if (hierarchy.isConfiguredFromEnv()) {
-                    log.info("   📄 Configuration loaded from: {}", hierarchy.getEnvConfigurationFile());
-
-                    int totalDevices = hierarchy.getRoomConfigurations().values().stream()
-                        .mapToInt(AssetDiscoveryService.RoomConfig::getDeviceCount).sum();
-
-                    if (totalDevices > 0) {
-                        log.info("   🎯 Ready to create {} devices across {} rooms",
-                            totalDevices, hierarchy.getRoomConfigurations().size());
-                        log.info("   💡 Devices will be automatically linked to their assigned rooms");
-                    }
-                } else {
-                    log.info("   ⚠️  Hierarchical assets found but no .env configuration");
-                    log.info("   💡 Consider running: python test-scenarios/asset-provision.py <scenario>.json");
-                }
-            } else {
-                log.info("🏭 No hierarchical assets detected - running in standalone mode");
-                log.info("   💡 Use Python asset provisioning script to create hierarchical scenarios");
-            }
-
-        } catch (Exception e) {
-            log.warn("Error detecting hierarchy: {}", e.getMessage());
-            log.info("🏭 Continuing with standalone device creation");
-        }
     }
-}

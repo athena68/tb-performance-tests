@@ -16,8 +16,7 @@
 package org.thingsboard.tools.service.gateway;
 
 import io.netty.util.concurrent.Future;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -40,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @ConditionalOnProperty(prefix = "device", value = "api", havingValue = "MQTT")
 public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITest {
@@ -95,7 +95,7 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
             gatewayNames = gateways.stream().map(Device::getName).collect(Collectors.toList());
         } else {
             gatewayNames = new ArrayList<>();
-            for (int i = gatewayStartIdx; i < gatewayEndIdx; i++) {
+            for (int i = gatewayStartIdx; i <= gatewayEndIdx; i++) {
                 gatewayNames.add(getToken(true, i));
             }
         }
@@ -161,7 +161,7 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
 
     private void mapDevicesToGatewayClientConnections() {
         int gatewayCount = mqttClients.size();
-        for (int i = deviceStartIdx; i < deviceEndIdx; i++) {
+        for (int i = deviceStartIdx; i <= deviceEndIdx; i++) {
             int deviceIdx = i - deviceStartIdx;
             int gatewayIdx = deviceIdx % gatewayCount;
             DeviceClient client = new DeviceClient();
@@ -172,6 +172,7 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
         }
     }
 
+    
     @Override
     public void warmUpDevices() throws InterruptedException {
         super.warmUpDevices();
@@ -338,7 +339,7 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
         if (gatewayList.isEmpty()) {
             log.info("Gateway list is empty, fetching from ThingsBoard...");
             gatewayList = new ArrayList<>();
-            for (int i = gatewayStartIdx; i < gatewayEndIdx; i++) {
+            for (int i = gatewayStartIdx; i <= gatewayEndIdx; i++) {
                 String gatewayName = getToken(true, i);
                 try {
                     Device gateway = restClientService.getRestClient().getTenantDevice(gatewayName).orElse(null);
@@ -360,7 +361,7 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
         // First, fetch all device objects from ThingsBoard
         log.info("Fetching device objects from ThingsBoard...");
         Map<String, Device> deviceMap = new HashMap<>();
-        for (int i = deviceStartIdx; i < deviceEndIdx; i++) {
+        for (int i = deviceStartIdx; i <= deviceEndIdx; i++) {
             String deviceName = getToken(false, i);
             try {
                 Device device = restClientService.getRestClient().getTenantDevice(deviceName).orElse(null);

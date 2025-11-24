@@ -14,10 +14,16 @@ import time
 from typing import Dict, List, Optional
 
 # Add config directory to path for attribute loading
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'config'))
+# Fixed: Use abspath to prevent hanging issue with relative paths
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config')))
 
 # Default credentials file location (matching cleanup script)
 DEFAULT_CREDENTIALS_FILE = 'test-scenarios/credentials.json'
+
+# HTTP request timeout (seconds) - prevents hanging on network issues
+HTTP_TIMEOUT = 30
+HTTP_RETRY_ATTEMPTS = 3
+HTTP_RETRY_DELAY = 2  # seconds between retries
 
 def load_credentials(creds_file: str = None) -> Dict[str, str]:
     """Load credentials from JSON file with user-friendly fallbacks (reused from cleanup script)"""
@@ -100,12 +106,27 @@ class ThingsBoardProvisioner:
             self.load_asset_attributes = None
             self.load_device_attributes = None
 
+    def _http_request_with_retry(self, method, *args, **kwargs):
+        """Execute HTTP request with retry logic for connection issues"""
+        for attempt in range(HTTP_RETRY_ATTEMPTS):
+            try:
+                return method(*args, **kwargs)
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+                if attempt < HTTP_RETRY_ATTEMPTS - 1:
+                    print(f"  ⚠ Connection issue (attempt {attempt + 1}/{HTTP_RETRY_ATTEMPTS}): {str(e)[:100]}")
+                    print(f"  ↻ Retrying in {HTTP_RETRY_DELAY} seconds...")
+                    time.sleep(HTTP_RETRY_DELAY)
+                else:
+                    raise
+
     def login(self) -> bool:
         """Login to ThingsBoard and get JWT token"""
         try:
-            response = requests.post(
+            response = self._http_request_with_retry(
+                requests.post,
                 f"{self.url}/api/auth/login",
-                json={"username": self.username, "password": self.password}
+                json={"username": self.username, "password": self.password},
+                timeout=HTTP_TIMEOUT
             )
             response.raise_for_status()
             self.token = response.json().get('token')
@@ -151,10 +172,12 @@ class ThingsBoardProvisioner:
             }
 
             # Create asset first (without attributes)
-            response = requests.post(
+            response = self._http_request_with_retry(
+                requests.post,
                 f"{self.url}/api/asset",
                 headers=self._get_headers(),
-                json=asset_payload
+                json=asset_payload,
+                timeout=HTTP_TIMEOUT
             )
 
             # Handle response
@@ -165,17 +188,25 @@ class ThingsBoardProvisioner:
                     print(f"  ⚠ Asset {name} already exists, deleting and recreating...")
                     # Find and delete existing asset
                     try:
-                        search_response = requests.get(
+                        search_response = self._http_request_with_retry(
+
+                            requests.get,
                             f"{self.url}/api/tenant/assets?pageSize=100&page=0&assetName={name}",
                             headers=self._get_headers()
+,
+                            timeout=HTTP_TIMEOUT
                         )
                         if search_response.status_code == 200:
                             assets = search_response.json().get('data', [])
                             for asset in assets:
                                 if asset.get('name') == name:
-                                    delete_response = requests.delete(
+                                    delete_response = self._http_request_with_retry(
+
+                                        requests.delete,
                                         f"{self.url}/api/asset/{asset['id']['id']}",
                                         headers=self._get_headers()
+,
+                                        timeout=HTTP_TIMEOUT
                                     )
                                     if delete_response.status_code in [200, 204]:
                                         print(f"  ✓ Deleted existing asset {name}")
@@ -185,10 +216,14 @@ class ThingsBoardProvisioner:
                         return None
 
                     # Retry creating the asset after deletion
-                    response = requests.post(
+                    response = self._http_request_with_retry(
+
+                        requests.post,
                         f"{self.url}/api/asset",
                         headers=self._get_headers(),
                         json=asset_payload
+,
+                        timeout=HTTP_TIMEOUT
                     )
                     if response.status_code not in [200, 201]:
                         print(f"  Debug - Retry failed: {response.text}")
@@ -238,10 +273,15 @@ class ThingsBoardProvisioner:
             # Use the original working endpoint format from the legacy script
             endpoint = f"{self.url}/api/plugins/telemetry/ASSET/{asset_id}/attributes/SERVER_SCOPE"
 
-            response = requests.post(
+            response = self._http_request_with_retry(
+
+
+                requests.post,
                 endpoint,
                 headers=self._get_headers(),
                 json=filtered_attributes
+,
+                timeout=HTTP_TIMEOUT
             )
             if response.status_code == 200:
                 print(f"  ✓ Set {len(filtered_attributes)} server attributes for asset using legacy API")
@@ -281,10 +321,15 @@ class ThingsBoardProvisioner:
             if attributes:
                 device_payload["attributes"] = attributes
 
-            response = requests.post(
+            response = self._http_request_with_retry(
+
+
+                requests.post,
                 f"{self.url}/api/device",
                 headers=self._get_headers(),
                 json=device_payload
+,
+                timeout=HTTP_TIMEOUT
             )
 
             # Handle response
@@ -321,6 +366,43 @@ class ThingsBoardProvisioner:
             print(f"✗ Failed to create device {name}: {e}")
             return None
 
+    def set_device_credentials(self, device_id: str, access_token: str) -> bool:
+        """Set device access token credentials"""
+        try:
+            # First, get current credentials to preserve deviceId field
+            get_response = self._http_request_with_retry(
+                requests.get,
+                f"{self.url}/api/device/{device_id}/credentials",
+                headers=self._get_headers(),
+                timeout=HTTP_TIMEOUT
+            )
+
+            if get_response.status_code != 200:
+                print(f"  ⚠ Could not retrieve current credentials: {get_response.text}")
+                return False
+
+            # Update credentials with new token
+            credentials_payload = get_response.json()
+            credentials_payload["credentialsType"] = "ACCESS_TOKEN"
+            credentials_payload["credentialsId"] = access_token
+
+            response = self._http_request_with_retry(
+                requests.post,
+                f"{self.url}/api/device/credentials",
+                headers=self._get_headers(),
+                json=credentials_payload,
+                timeout=HTTP_TIMEOUT
+            )
+
+            if response.status_code not in [200, 201]:
+                print(f"  ⚠ Failed to set credentials for device {device_id}: {response.text}")
+                return False
+
+            return True
+        except Exception as e:
+            print(f"  ⚠ Error setting credentials for device {device_id}: {e}")
+            return False
+
     def create_relation(self, from_id: str, from_type: str, to_id: str, to_type: str, relation_type: str = "Contains") -> bool:
         """Create relation between entities"""
         try:
@@ -335,11 +417,26 @@ class ThingsBoardProvisioner:
                 },
                 "type": relation_type
             }
-            response = requests.post(
+            response = self._http_request_with_retry(
+
+                requests.post,
                 f"{self.url}/api/relation",
                 headers=self._get_headers(),
                 json=relation_payload
+,
+                timeout=HTTP_TIMEOUT
             )
+
+            # Handle response - relation might already exist
+            if response.status_code == 400:
+                response_data = response.json()
+                if 'already exists' in response_data.get('message', '').lower():
+                    # Relation already exists - this is fine
+                    return True
+                else:
+                    print(f"  ⚠ Relation creation failed: {response_data.get('message', 'Unknown error')}")
+                    return False
+
             response.raise_for_status()
             return True
         except Exception as e:
@@ -349,10 +446,14 @@ class ThingsBoardProvisioner:
     def add_attributes(self, entity_id: str, entity_type: str, attributes: Dict) -> bool:
         """Add server attributes to an entity (matches original script exactly)"""
         try:
-            response = requests.post(
+            response = self._http_request_with_retry(
+
+                requests.post,
                 f"{self.url}/api/plugins/telemetry/{entity_type}/{entity_id}/attributes/SERVER_SCOPE",
                 headers=self._get_headers(),
                 json=attributes
+,
+                timeout=HTTP_TIMEOUT
             )
             response.raise_for_status()
             return True
@@ -548,14 +649,42 @@ class ThingsBoardProvisioner:
                             gateway_config.get('label', gateway_config['name'])
                         )
                         if not gateway:
-                            print(f"    ⚠ Gateway {gateway_config['name']} already exists, skipping creation")
-                            continue
+                            # Gateway already exists - retrieve its ID to create devices
+                            print(f"    ⚠ Gateway {gateway_config['name']} already exists, retrieving ID...")
+                            try:
+                                response = self._http_request_with_retry(
+                                    requests.get,
+                                    f"{self.url}/api/tenant/devices?pageSize=100&page=0",
+                                    headers=self._get_headers(),
+                                    timeout=HTTP_TIMEOUT
+                                )
+                                if response.status_code == 200:
+                                    devices = response.json().get('data', [])
+                                    for device in devices:
+                                        if device['name'] == gateway_config['name']:
+                                            gateway = device['id']['id']
+                                            print(f"    ✓ Retrieved existing gateway ID: {gateway[:8]}...")
+                                            break
 
-                        self.created_entities['gateways'].append(gateway)
+                                if not gateway:
+                                    print(f"    ✗ Could not find existing gateway {gateway_config['name']}")
+                                    continue
+                            except Exception as e:
+                                print(f"    ✗ Failed to retrieve gateway {gateway_config['name']}: {e}")
+                                continue
+                        else:
+                            self.created_entities['gateways'].append(gateway)
 
                         # Create Room -> Gateway relation (matches original script exactly)
                         if not self.create_relation(room, 'ASSET', gateway, 'DEVICE'):
                             return False
+
+                        # Set gateway credentials (token = gateway name)
+                        # This allows Java app to connect using gateway name as token
+                        if not self.set_device_credentials(gateway, gateway_config['name']):
+                            print(f"  ⚠ Could not set credentials for gateway {gateway_config['name']}")
+                        else:
+                            print(f"  ✓ Set access token for gateway {gateway_config['name']}")
 
                         # Add protocol as server attribute to gateway device (matches original script)
                         try:
@@ -626,6 +755,10 @@ class ThingsBoardProvisioner:
                             if device:
                                 self.created_entities['devices'].append(device)
 
+                                # Set device credentials (token = device name)
+                                if not self.set_device_credentials(device, device_name):
+                                    print(f"      ⚠ Could not set credentials for device {device_name}")
+
                                 # Create Gateway -> Device relation
                                 if not self.create_relation(gateway, 'DEVICE', device, 'DEVICE'):
                                     return False
@@ -677,7 +810,7 @@ class ThingsBoardProvisioner:
         env_content.append("# ThingsBoard Server Configuration")
         env_content.append(f"REST_URL={self.url}")
         env_content.append(f"REST_USERNAME={self.username}")
-        env_content.append("REST_PASSWORD=REPLACE_WITH_ACTUAL_PASSWORD")
+        env_content.append(f"REST_PASSWORD={self.password}")
         env_content.append("REST_POOL_SIZE=4")
         env_content.append("")
 
@@ -700,22 +833,44 @@ class ThingsBoardProvisioner:
         env_content.append("DEVICE_API=MQTT")
         env_content.append("")
 
+        # Read test configuration from scenario
+        test_config = self.scenario.get('testConfig', {})
+        payload_type = test_config.get('payloadType', 'default')
+        messages_per_second = test_config.get('messagesPerSecond', 60)
+        duration_in_seconds = test_config.get('durationInSeconds', 86400)
+
+        # Calculate device and gateway counts from scenario configuration
+        # This works even if entities already existed and weren't newly created
+        num_gateways = 0
+        num_devices = 0
+
+        for building in self.scenario.get('buildings', []):
+            for floor in building.get('floors', []):
+                for room in floor.get('rooms', []):
+                    gateways = room.get('gateways', [])
+                    num_gateways += len(gateways)
+                    for gateway in gateways:
+                        device_config = gateway.get('devices', {})
+                        num_devices += device_config.get('count', 0)
+
         env_content.append("# Gateway Configuration")
         env_content.append(f"GATEWAY_START_IDX=0")
-        env_content.append(f"GATEWAY_END_IDX={len(self.created_entities['gateways'])}")
+        env_content.append(f"GATEWAY_END_IDX={num_gateways - 1 if num_gateways > 0 else 0}")
+        env_content.append(f"GATEWAY_COUNT={num_gateways}")
         env_content.append("GATEWAY_CREATE_ON_START=false  # Already created by provisioner")
         env_content.append("GATEWAY_DELETE_ON_COMPLETE=false")
         env_content.append("")
 
         env_content.append("# Device Configuration")
         env_content.append("DEVICE_START_IDX=0")
-        env_content.append(f"DEVICE_END_INDEX={len(self.created_entities['devices'])}")
-        env_content.append("DEVICE_CREATE_ON_START=false   # IMPORTANT: Let gateway auto-provision devices!")
+        env_content.append(f"DEVICE_END_IDX={num_devices - 1 if num_devices > 0 else 0}")
+        env_content.append(f"DEVICE_COUNT={num_devices}")
+        env_content.append("DEVICE_CREATE_ON_START=false   # Already created by provisioner")
         env_content.append("DEVICE_DELETE_ON_COMPLETE=false")
         env_content.append("")
 
         env_content.append("# Test Payload Type")
-        env_content.append("TEST_PAYLOAD_TYPE=EBMPAPST_FFU")
+        env_content.append(f"TEST_PAYLOAD_TYPE={payload_type}")
         env_content.append("")
 
         env_content.append("# Test Execution Configuration")
@@ -724,8 +879,8 @@ class ThingsBoardProvisioner:
         env_content.append("")
 
         env_content.append("# Message Rate Configuration")
-        env_content.append("MESSAGES_PER_SECOND=60")
-        env_content.append("DURATION_IN_SECONDS=86400")
+        env_content.append(f"MESSAGES_PER_SECOND={messages_per_second}")
+        env_content.append(f"DURATION_IN_SECONDS={duration_in_seconds}")
         env_content.append("")
 
         env_content.append("# Alarm Configuration")
@@ -758,7 +913,8 @@ def main():
     parser.add_argument('--password', help='ThingsBoard password (required if not using --credentials)')
     parser.add_argument('--credentials', help='Credentials JSON file path')
     parser.add_argument('--no-config-attrs', action='store_true', help='Disable configurable attributes (use hardcoded fallbacks)')
-    parser.add_argument('--env-file', help='Save .env file for gateway configuration')
+    parser.add_argument('--env-file', default='.env', help='Save .env file for gateway configuration (default: .env)')
+    parser.add_argument('--no-env-file', action='store_true', help='Skip .env file generation')
 
     args = parser.parse_args()
 
@@ -816,7 +972,8 @@ def main():
     # Provision scenario
     success = provisioner.provision_scenario(args.scenario_file)
 
-    if success and args.env_file:
+    # Auto-generate .env file unless --no-env-file is specified
+    if success and not args.no_env_file:
         env_content = provisioner.generate_env_file()
         with open(args.env_file, 'w') as f:
             f.write(env_content)
