@@ -67,7 +67,34 @@ public class DeviceProfileManagerImpl implements DeviceProfileManager {
 
 
     List<String> getFiles() throws IOException {
-        return IOUtils.readLines(this.getClass().getClassLoader().getResourceAsStream(DEVICE_PROFILE_RESOURCE_PATH), UTF_8);
+        // Explicitly list device profile files since directory listing doesn't work in Spring Boot fat JARs
+        List<String> files = new ArrayList<>();
+
+        // List of known device profile files
+        String[] knownProfiles = {
+            "ebmpapst_ffu.json",
+            "smart_tracker.json",
+            "smart_meter.json",
+            "industrial_plc.json"
+        };
+
+        // Check which profiles actually exist as resources
+        for (String profileFile : knownProfiles) {
+            try {
+                if (this.getClass().getClassLoader().getResource(DEVICE_PROFILE_RESOURCE_PATH + profileFile) != null) {
+                    files.add(profileFile);
+                    log.debug("Found device profile resource: {}", profileFile);
+                }
+            } catch (Exception e) {
+                log.debug("Device profile {} not found in resources", profileFile);
+            }
+        }
+
+        if (files.isEmpty()) {
+            log.warn("No device profile resources found in {}", DEVICE_PROFILE_RESOURCE_PATH);
+        }
+
+        return files;
     }
 
     @Override
