@@ -461,6 +461,86 @@ class ThingsBoardProvisioner:
             print(f"  ✗ Failed to add attributes: {e}")
             return False
 
+    def create_device_profile(self, profile_file_path: str) -> Optional[str]:
+        """Create device profile from JSON file"""
+        try:
+            # Load profile JSON
+            with open(profile_file_path, 'r') as f:
+                profile_data = json.load(f)
+
+            profile_name = profile_data.get('name')
+            if not profile_name:
+                print(f"  ⚠ No 'name' field in device profile JSON")
+                return None
+
+            # Check if profile already exists
+            response = self._http_request_with_retry(
+                requests.get,
+                f"{self.url}/api/deviceProfiles?pageSize=1000&page=0",
+                headers=self._get_headers(),
+                timeout=HTTP_TIMEOUT
+            )
+
+            if response.status_code == 200:
+                existing_profiles = response.json().get('data', [])
+                for profile in existing_profiles:
+                    if profile.get('name') == profile_name:
+                        # Profile exists - check if it needs updating (has alarm rules)
+                        profile_data_obj = profile.get('profileData', {})
+                        existing_alarms = profile_data_obj.get('alarms') if profile_data_obj else None
+                        existing_alarm_count = len(existing_alarms) if existing_alarms is not None else 0
+                        new_alarm_count = len(profile_data.get('profileData', {}).get('alarms', []))
+
+                        if existing_alarm_count == 0 and new_alarm_count > 0:
+                            # Update existing profile with alarm rules
+                            print(f"  ⚠ Device profile '{profile_name}' exists but has no alarm rules, updating...")
+                            profile_data['id'] = profile.get('id')
+                            profile_data['createdTime'] = profile.get('createdTime')
+
+                            update_response = self._http_request_with_retry(
+                                requests.post,
+                                f"{self.url}/api/deviceProfile",
+                                headers=self._get_headers(),
+                                json=profile_data,
+                                timeout=HTTP_TIMEOUT
+                            )
+
+                            if update_response.status_code in [200, 201]:
+                                print(f"  ✓ Updated device profile: {profile_name} with {new_alarm_count} alarm rules")
+                                profile_id = profile.get('id')
+                                return profile_id.get('id') if isinstance(profile_id, dict) else profile_id
+                            else:
+                                print(f"  ⚠ Failed to update device profile: {update_response.text}")
+                                profile_id = profile.get('id')
+                                return profile_id.get('id') if isinstance(profile_id, dict) else profile_id
+                        else:
+                            print(f"  ℹ Device profile '{profile_name}' already exists with {existing_alarm_count} alarm rules")
+                            profile_id = profile.get('id')
+                            return profile_id.get('id') if isinstance(profile_id, dict) else profile_id
+
+            # Create new profile
+            response = self._http_request_with_retry(
+                requests.post,
+                f"{self.url}/api/deviceProfile",
+                headers=self._get_headers(),
+                json=profile_data,
+                timeout=HTTP_TIMEOUT
+            )
+
+            if response.status_code in [200, 201]:
+                alarm_count = len(profile_data.get('profileData', {}).get('alarms', []))
+                print(f"  ✓ Created device profile: {profile_name} with {alarm_count} alarm rules")
+                result = response.json()
+                profile_id = result.get('id')
+                return profile_id.get('id') if isinstance(profile_id, dict) else profile_id
+            else:
+                print(f"  ✗ Failed to create device profile: {response.text}")
+                return None
+
+        except Exception as e:
+            print(f"  ✗ Error creating device profile: {e}")
+            return None
+
     def validate_scenario(self, scenario: Dict) -> bool:
         """Validate scenario configuration"""
         print("============================================================")
@@ -535,6 +615,20 @@ class ThingsBoardProvisioner:
         # Validate scenario before provisioning
         if not self.validate_scenario(scenario):
             return False
+
+        # Create device profiles BEFORE creating devices
+        # This ensures devices get the correct profile with alarm rules
+        print("\n============================================================")
+        print("Creating Device Profiles")
+        print("============================================================\n")
+
+        # Path to device profile JSON (relative to project root)
+        profile_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'device-profiles', 'ebmpapst_ffu.json')
+        if os.path.exists(profile_path):
+            self.create_device_profile(profile_path)
+        else:
+            print(f"  ⚠ Device profile not found at: {profile_path}")
+            print(f"  ℹ Will use auto-created profile (without alarm rules)")
 
         # Create Site with configurable attributes
         site_config = scenario.get('site', {})
