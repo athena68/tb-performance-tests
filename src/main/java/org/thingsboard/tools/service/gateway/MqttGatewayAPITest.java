@@ -56,6 +56,9 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     private GatewayRelationManager gatewayRelationManager;
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private GatewayAttributesGenerator gatewayAttributesGenerator;
+
     private List<Device> gateways = Collections.synchronizedList(new ArrayList<>(1024));
 
     private int gatewayStartIdx;
@@ -262,6 +265,66 @@ public class MqttGatewayAPITest extends BaseMqttAPITest implements GatewayAPITes
             log.info("Initial attributes sent successfully for {} devices! Failed: {}", totalSent.get(), totalFailed.get());
         } else {
             log.error("Timeout while sending initial attributes! Sent: {}, Failed: {}, Remaining: {}",
+                totalSent.get(), totalFailed.get(), latch.getCount());
+        }
+    }
+
+    /**
+     * Send initial attributes for gateway devices themselves
+     */
+    public void sendGatewayAttributes() throws InterruptedException {
+        if (gatewayAttributesGenerator == null) {
+            log.warn("GatewayAttributesGenerator not available, skipping gateway attributes");
+            return;
+        }
+
+        log.info("Sending initial attributes for {} gateways...", mqttClients.size());
+        AtomicInteger totalSent = new AtomicInteger();
+        AtomicInteger totalFailed = new AtomicInteger();
+        CountDownLatch latch = new CountDownLatch(mqttClients.size());
+
+        for (int i = 0; i < mqttClients.size(); i++) {
+            final int gatewayIdx = i;
+            final String gatewayName = getToken(true, gatewayStartIdx + gatewayIdx);
+
+            restClientService.getScheduler().submit(() -> {
+                try {
+                    // Generate gateway attributes
+                    byte[] payload = gatewayAttributesGenerator.generateAttributes(gatewayName);
+
+                    if (payload.length > 0) {
+                        // Send gateway's own attributes using standard device API
+                        mqttClients.get(gatewayIdx).publish("v1/devices/me/attributes",
+                            io.netty.buffer.Unpooled.wrappedBuffer(payload),
+                            io.netty.handler.codec.mqtt.MqttQoS.AT_MOST_ONCE)
+                                .addListener(future -> {
+                                    if (future.isSuccess()) {
+                                        totalSent.incrementAndGet();
+                                        log.debug("Gateway attributes sent for: {}", gatewayName);
+                                    } else {
+                                        totalFailed.incrementAndGet();
+                                        log.error("Failed to send gateway attributes for: {}", gatewayName, future.cause());
+                                    }
+                                    latch.countDown();
+                                });
+                    } else {
+                        log.warn("Empty payload for gateway: {}", gatewayName);
+                        totalFailed.incrementAndGet();
+                        latch.countDown();
+                    }
+                } catch (Exception e) {
+                    totalFailed.incrementAndGet();
+                    log.error("Error preparing attributes for gateway: {}", gatewayName, e);
+                    latch.countDown();
+                }
+            });
+        }
+
+        boolean completed = latch.await(30, TimeUnit.SECONDS);
+        if (completed) {
+            log.info("Gateway attributes sent successfully for {} gateways! Failed: {}", totalSent.get(), totalFailed.get());
+        } else {
+            log.error("Timeout while sending gateway attributes! Sent: {}, Failed: {}, Remaining: {}",
                 totalSent.get(), totalFailed.get(), latch.getCount());
         }
     }

@@ -58,6 +58,9 @@ public class GatewayBaseTestExecutor extends BaseTestExecutor {
 
         // Real-world behavior: Send attributes once after provisioning (bootstrap)
         gatewayAPITest.sendInitialAttributes();
+
+        // Send gateway's own attributes (manufacturer, model, firmware, etc.)
+        gatewayAPITest.sendGatewayAttributes();
     }
 
     @Override

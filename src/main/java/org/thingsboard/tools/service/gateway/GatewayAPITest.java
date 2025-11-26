@@ -31,6 +31,8 @@ public interface GatewayAPITest {
 
     void sendInitialAttributes() throws InterruptedException;
 
+    void sendGatewayAttributes() throws InterruptedException;
+
     void createGatewayDeviceRelations() throws Exception;
 
     void runApiTests() throws InterruptedException;
