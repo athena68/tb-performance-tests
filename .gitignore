@@ -38,3 +38,4 @@ pom.xml.versionsBackup
 test-scenarios/credentials.json
 credentials.json
 scripts/device-management/setup-gateway-credentials.sh
+config/__pycache__/*

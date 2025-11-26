@@ -3,7 +3,7 @@
 
 # Device Information
 device_info:
-  manufacturer: "ThingsBoard"
+  manufacturer: "EBMPAPST"
   gw_model:
     - "TB-GW-100"
     - "TB-GW-200"
